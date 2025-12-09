@@ -8,10 +8,10 @@ exports.login = async (req, res) => {
     const { email, password } = req.query;
 
     const user = await User.findOne({ Email: email });
-    if (!user) return res.status(404).json({ error_message: "User not found" });
+    if (!user) return res.status(404).json({ error_message: "User not found." });
 
     const isPasswordCorrect = await passwords_helper.verifyPassword(password, user.Password);
-    if (!isPasswordCorrect) return res.status(401).json({ error_message: "Password is incorrect" });
+    if (!isPasswordCorrect) return res.status(401).json({ error_message: "Password is incorrect." });
 
     const token = jsonWebToken.generateToken({
       id: user.ID,
@@ -35,14 +35,12 @@ exports.register = async (req, res) => {
     const currentYear = new Date().getFullYear();
 
     if (currentYear - enrollmentYear > 7) {
-      return res.status(400).json({ error_message: "Student ID is older than 7 years" });
+      return res.status(400).json({ error_message: "Student ID is older than 7 years." });
     }
 
     const existingUserByEmail = await User.findOne({ Email: email });
     if (existingUserByEmail) {
-      return res.status(409).json({ 
-        error_message: "Email already exists. Please use a different email address or try logging in." 
-      });
+      return res.status(409).json({ error_message: "Email already exists. Please use a different email address or try logging in." });
     }
 
     const existingUserByStudentID = await User.findOne({ StudentID: studentId });
@@ -96,6 +94,6 @@ exports.register = async (req, res) => {
       });
     }
     
-    res.status(500).json({ error_message: "Failed to create User" });
+    res.status(500).json({ error_message: "Failed to create user." });
   }
 };

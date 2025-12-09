@@ -54,7 +54,7 @@ exports.getPlatformAnalytics = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to fetch analytics" });
+    res.status(500).json({ error_message: "Failed to fetch analytics." });
   }
 };
 
@@ -113,7 +113,7 @@ exports.getTrendingPosts = async (req, res) => {
     res.status(200).json({ data: trendingPosts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to fetch trending posts" });
+    res.status(500).json({ error_message: "Failed to fetch trending posts." });
   }
 };
 
@@ -266,6 +266,6 @@ exports.getActivityFeed = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to fetch activity feed" });
+    res.status(500).json({ error_message: "Failed to fetch activity feed." });
   }
 };

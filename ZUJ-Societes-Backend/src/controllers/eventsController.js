@@ -21,7 +21,7 @@ exports.getAllEvents = async (req, res) => {
     res.status(200).json({ data: events });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get Events" });
+    res.status(500).json({ error_message: "Failed to get events." });
   }
 };
 
@@ -31,14 +31,14 @@ exports.getEventInfo = async (req, res) => {
 
     const event = await Event.findOne({ ID: event_id }).lean();
     if (!event) {
-      return res.status(404).json({ error_message: "Event not found" });
+      return res.status(404).json({ error_message: "Event not found." });
     }
 
     const organizer = await User.findOne({ ID: event.User }).select("Name").lean();
     res.status(200).json({ data: { ...event, Organizer: organizer?.Name || null } });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get Event info" });
+    res.status(500).json({ error_message: "Failed to get Event info." });
   }
 };
 
@@ -60,7 +60,7 @@ exports.createEvent = async (req, res) => {
     const society = await Society.findOne({ ID: society_id });
 
     if (!society) {
-      return res.status(404).json({ error_message: 'Society not found' });
+      return res.status(404).json({ error_message: 'Society not found.' });
     }
 
     const whoCanCreateEvent = society.Permissions?.whoCanCreateEvents || 'all-members';
@@ -120,7 +120,7 @@ exports.createEvent = async (req, res) => {
     res.status(201).json({ data: newEvent });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to create event" });
+    res.status(500).json({ error_message: "Failed to create event." });
   }
 };
 
@@ -131,12 +131,12 @@ exports.deleteEvent = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!event_id) {
-      return res.status(400).json({ error_message: "Event ID is required" });
+      return res.status(400).json({ error_message: "Event ID is required." });
     }
 
     const event = await Event.findOne({ ID: event_id });
     if (!event) {
-      return res.status(404).json({ error_message: "Event not found" });
+      return res.status(404).json({ error_message: "Event not found." });
     }
 
     const isCreator = event.User && event.User === userId;
@@ -155,13 +155,13 @@ exports.deleteEvent = async (req, res) => {
     }
 
     if (!isCreator && !isAdminOrModerator) {
-      return res.status(403).json({ error_message: "You don't have permission to delete this event" });
+      return res.status(403).json({ error_message: "You don't have permission to delete this event." });
     }
 
     const result = await Event.deleteOne({ ID: event_id });
 
     if (result.deletedCount === 0) {
-      return res.status(404).json({ error_message: "Event not found" });
+      return res.status(404).json({ error_message: "Event not found." });
     }
 
     res.status(200).json({
@@ -170,7 +170,7 @@ exports.deleteEvent = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to delete event" });
+    res.status(500).json({ error_message: "Failed to delete event." });
   }
 };
 
@@ -205,7 +205,7 @@ exports.getEventsBySociety = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get Events for this society" });
+    res.status(500).json({ error_message: "Failed to get Events for this society." });
   }
 };
 
@@ -214,7 +214,7 @@ exports.getEventStats = async (req, res) => {
     const { event_id } = req.query;
 
     if (!event_id) {
-      return res.status(400).json({ error_message: "Event ID is required" });
+      return res.status(400).json({ error_message: "Event ID is required." });
     }
 
     const [attendingCount, shareCount] = await Promise.all([
@@ -230,7 +230,7 @@ exports.getEventStats = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get event statistics" });
+    res.status(500).json({ error_message: "Failed to get event statistics." });
   }
 };
 
@@ -241,12 +241,12 @@ exports.toggleEventAttendance = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!event_id || !status) {
-      return res.status(400).json({ error_message: "Event ID and status are required" });
+      return res.status(400).json({ error_message: "Event ID and status are required." });
     }
 
     const event = await Event.findOne({ ID: event_id });
     if (!event) {
-      return res.status(404).json({ error_message: "Event not found" });
+      return res.status(404).json({ error_message: "Event not found." });
     }
 
     let attendance = await EventAttendance.findOne({ Event: event_id, User: userId });
@@ -272,7 +272,7 @@ exports.toggleEventAttendance = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to update event attendance" });
+    res.status(500).json({ error_message: "Failed to update event attendance." });
   }
 };
 
@@ -283,7 +283,7 @@ exports.recordEventShare = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!event_id) {
-      return res.status(400).json({ error_message: "Event ID is required" });
+      return res.status(400).json({ error_message: "Event ID is required." });
     }
 
     const shareRecord = new EventInteractions({
@@ -293,7 +293,7 @@ exports.recordEventShare = async (req, res) => {
     });
     await shareRecord.save();
 
-    res.status(200).json({ data: { message: "Share recorded successfully" } });
+    res.status(200).json({ data: { message: "Share recorded successfully." } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to record share" });
@@ -308,7 +308,7 @@ exports.getUserEventStatus = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!event_id) {
-      return res.status(400).json({ error_message: "Event ID is required" });
+      return res.status(400).json({ error_message: "Event ID is required." });
     }
 
     const attendance = await EventAttendance.findOne({ Event: event_id, User: userId });
@@ -320,7 +320,7 @@ exports.getUserEventStatus = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get user event status" });
+    res.status(500).json({ error_message: "Failed to get user event status." });
   }
 };
 
@@ -364,6 +364,6 @@ exports.getEventsAttendedByUser = async (req, res) => {
     res.status(200).json({ data: result });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get events attended by user" });
+    res.status(500).json({ error_message: "Failed to get events attended by user." });
   }
 };

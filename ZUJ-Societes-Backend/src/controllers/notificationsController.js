@@ -11,7 +11,7 @@ exports.getNotifications = async (req, res) => {
     res.status(200).json({ data: notifications });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to fetch notifications" });
+    res.status(500).json({ error_message: "Failed to fetch notifications." });
   }
 };
 
@@ -33,7 +33,7 @@ exports.markNotificationAsRead = async (req, res) => {
     res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to mark notification as read" });
+    res.status(500).json({ error_message: "Failed to mark notification as read." });
   }
 };
 
@@ -46,6 +46,6 @@ exports.markAllNotificationsAsRead = async (req, res) => {
     res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to mark all notifications as read" });
+    res.status(500).json({ error_message: "Failed to mark all notifications as read." });
   }
 };

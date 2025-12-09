@@ -1,6 +1,5 @@
 import Hero from "./Components/Hero";
 import Features from "./Components/Features";
-import Stats from "./Components/Stats";
 import Contact from "./Components/Contact";
 
 export default function About() {
@@ -9,7 +8,6 @@ export default function About() {
       <div className="max-w-4xl mx-auto">
         <Hero />
         <Features />
-        <Stats />
         <Contact />
       </div>
     </main>

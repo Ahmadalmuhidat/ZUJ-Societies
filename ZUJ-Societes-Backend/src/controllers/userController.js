@@ -11,7 +11,7 @@ exports.searchUsers = async (req, res) => {
     const { query } = req.query;
 
     if (!query || query.length < 2) {
-      return res.status(400).json({ error_message: "Query must be at least 2 characters long" });
+      return res.status(400).json({ error_message: "Query must be at least 2 characters long." });
     }
 
     const users = await User.find(
@@ -27,7 +27,7 @@ exports.searchUsers = async (req, res) => {
     res.status(200).json({ data: users });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to search users" });
+    res.status(500).json({ error_message: "Failed to search users." });
   }
 };
 
@@ -36,11 +36,11 @@ exports.getUserInformation = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = jsonWebToken.verifyToken(token)['id'];
     const user = await User.findOne({ ID: userId }, 'ID Name Email');
-    if (!user) return res.status(404).json({ error_message: "User not found" });
+    if (!user) return res.status(404).json({ error_message: "User not found." });
     res.status(200).json({ data: user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get User" });
+    res.status(500).json({ error_message: "Failed to get User." });
   }
 };
 
@@ -54,7 +54,7 @@ exports.getUserProfileInformation = async (req, res) => {
       'ID Name Email Phone_Number Bio Photo CreatedAt Notifications Privacy'
     );
 
-    if (!user) return res.status(404).json({ error_message: "User not found" });
+    if (!user) return res.status(404).json({ error_message: "User not found." });
 
     const [postCount, eventCount, societyCount] = await Promise.all([
       Post.countDocuments({ User: userId }),
@@ -72,7 +72,7 @@ exports.getUserProfileInformation = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get User profile" });
+    res.status(500).json({ error_message: "Failed to get User profile." });
   }
 };
 
@@ -96,12 +96,12 @@ exports.updateProfile = async (req, res) => {
       { new: true }
     );
 
-    if (!result) return res.status(404).json({ error_message: "User not found" });
+    if (!result) return res.status(404).json({ error_message: "User not found." });
 
     res.status(200).json({ data: result });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to update User profile" });
+    res.status(500).json({ error_message: "Failed to update User profile." });
   }
 };
 
@@ -150,7 +150,7 @@ exports.getPostsByUserPublic = async (req, res) => {
     const userID = jsonWebToken.verifyToken(token)['id'];
 
     if (!userID) {
-      return res.status(400).json({ error_message: 'user_id is required' });
+      return res.status(400).json({ error_message: 'user_id is required.' });
     };
 
     const posts = await Post.find({ User: userID }, 'ID Content Image CreatedAt Likes')
@@ -161,7 +161,7 @@ exports.getPostsByUserPublic = async (req, res) => {
     res.status(200).json({ data: posts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: 'Failed to get user posts' });
+    res.status(500).json({ error_message: 'Failed to get user posts.' });
   }
 };
 
@@ -172,7 +172,7 @@ exports.getSocietiesByUserPublic = async (req, res) => {
     const userID = jsonWebToken.verifyToken(token)['id'];
 
     if (!userID) {
-      return res.status(400).json({ error_message: 'user_id is required' });
+      return res.status(400).json({ error_message: 'user_id is required.' });
     }
 
     const societies = await Society.find({ User: userID }, 'ID Name Category Description Image CreatedAt')
@@ -193,6 +193,6 @@ exports.getSocietiesByUserPublic = async (req, res) => {
     res.status(200).json({ data: societiesWithCounts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: 'Failed to get user societies' });
+    res.status(500).json({ error_message: 'Failed to get user societies.' });
   }
 };

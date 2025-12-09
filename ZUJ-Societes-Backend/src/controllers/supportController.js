@@ -18,7 +18,7 @@ exports.CreateTicket = async (req, res) => {
     res.status(201).json({ data: newTicket });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to create ticket" });
+    res.status(500).json({ error_message: "Failed to create ticket." });
   }
 };
 
@@ -39,7 +39,7 @@ exports.reportPost = async (req, res) => {
     res.status(201).json({ data: newReport });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to report post" });
+    res.status(500).json({ error_message: "Failed to report post." });
   }
 };
 
@@ -60,6 +60,6 @@ exports.reportEvent = async (req, res) => {
     res.status(201).json({ data: newReport });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to report event" });
+    res.status(500).json({ error_message: "Failed to report event." });
   }
 };

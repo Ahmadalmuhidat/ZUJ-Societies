@@ -24,12 +24,6 @@ class SSEManager {
     }
   }
 
-  // async streamNotifications(res) {
-  //   const interval = setInterval(async () => {
-
-  //   }, 1000);
-  // }
-
   addClient(userId, res) {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -90,45 +84,3 @@ class SSEManager {
 }
 
 module.exports = new SSEManager();
-
-
-
-
-// const interval = setInterval(async () => {
-//   try {
-//     const BUFFER_MS = 1000; // 1 second buffer
-//     // Quick explanation: I used a time buffer to make sure we don’t miss any data
-//     // since it is being sent through RabbitMQ before it reaches the database.
-
-//     // Fetch new data entries since lastTimestamp minus buffer
-//     const dataEntries = await prisma.TimeSeries.findMany({
-//       where: {
-//         deviceId: Number(req.params.id),
-//         timestamp: {
-//           gte: new Date(lastTimestamp.getTime() - BUFFER_MS),
-//         },
-//       },
-//       orderBy: {
-//         timestamp: 'asc',
-//       },
-//     });
-
-//     if (dataEntries.length > 0) {
-//       // Update lastTimestamp to the timestamp of the last entry sent
-//       lastTimestamp = new Date(dataEntries[dataEntries.length - 1].timestamp);
-//       // Send data entries to client
-//       res.write(`data: ${JSON.stringify(dataEntries)}\n\n`);
-//     } else {
-//       // No new data, send empty array
-//       res.write(`data: ${JSON.stringify([])}\n\n`);
-//     }
-//   } catch (err) {
-//     console.error("Error fetching data:", err);
-//     res.write(`event: error\ndata: ${JSON.stringify({ error: 'Failed to fetch data' })}\n\n`);
-//   }
-// }, 1000); // Poll every second
-
-// req.on("close", () => {
-//   clearInterval(interval);
-//   console.log("SSE connection closed for device", req.params.id);
-// });

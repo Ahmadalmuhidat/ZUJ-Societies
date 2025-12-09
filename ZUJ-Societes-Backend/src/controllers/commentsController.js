@@ -44,7 +44,7 @@ exports.createComment = async (req, res) => {
     res.status(201).json({ data: newComment });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to create comment" });
+    res.status(500).json({ error_message: "Failed to create comment." });
   }
 };
 
@@ -56,18 +56,18 @@ exports.deleteComment = async (req, res) => {
 
     const comment = await Comment.findOne({ ID: comment_id });
     if (!comment) {
-      return res.status(404).json({ error_message: "Comment not found" });
+      return res.status(404).json({ error_message: "Comment not found." });
     }
 
     if (comment.User !== userId) {
-      return res.status(403).json({ error_message: "Not authorized to delete this comment" });
+      return res.status(403).json({ error_message: "Not authorized to delete this comment." });
     }
 
     const result = await Comment.deleteOne({ ID: comment_id });
-    res.status(200).json({ message: "Comment deleted successfully", data: result });
+    res.status(200).json({ message: "Comment deleted successfully.", data: result });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to delete comment" });
+    res.status(500).json({ error_message: "Failed to delete comment." });
   }
 };
 
@@ -93,6 +93,6 @@ exports.getCommentsByPost = async (req, res) => {
     res.status(200).json({ data });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get Comments for this post" });
+    res.status(500).json({ error_message: "Failed to get Comments for this post." });
   }
 };

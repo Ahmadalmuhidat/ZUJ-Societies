@@ -50,7 +50,7 @@ exports.getAllPosts = async (req, res) => {
     return res.status(200).json({ data: postsWithDetails });
   } catch (err) {
     console.error("Error in getAllPosts:", err);
-    return res.status(500).json({ error_message: "Failed to get Posts" });
+    return res.status(500).json({ error_message: "Failed to get posts." });
   }
 };
 
@@ -62,7 +62,7 @@ exports.createPost = async (req, res) => {
 
     const society = await Society.findOne({ ID: society_id });
     if (!society) {
-      return res.status(404).json({ error_message: 'Society not found' });
+      return res.status(404).json({ error_message: 'Society not found.' });
     }
 
     const whoCanPost = society.Permissions?.whoCanPost || 'all-members';
@@ -89,10 +89,10 @@ exports.createPost = async (req, res) => {
     });
 
     await post.save();
-    res.status(201).json({ message: 'Post created successfully', post });
+    res.status(201).json({ message: 'Post created successfully.', post });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error_message: 'Internal server error' });
+    res.status(500).json({ error_message: 'Internal server error.' });
   }
 };
 
@@ -103,23 +103,23 @@ exports.deletePost = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!userId) {
-      return res.status(401).json({ error_message: "Invalid token payload" });
+      return res.status(401).json({ error_message: "Invalid token payload." });
     }
 
     const post = await Post.findOne({ ID: post_id });
     if (!post) {
-      return res.status(404).json({ error_message: "Post not found" });
+      return res.status(404).json({ error_message: "Post not found." });
     }
 
     if (String(post.User) !== String(userId)) {
-      return res.status(403).json({ error_message: "Not authorized to delete this post" });
+      return res.status(403).json({ error_message: "Not authorized to delete this post." });
     }
 
     await Post.deleteOne({ ID: post_id });
-    res.status(200).json({ message: "Post deleted successfully" });
+    res.status(200).json({ message: "Post deleted successfully." });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to delete post" });
+    res.status(500).json({ error_message: "Failed to delete post." });
   }
 };
 
@@ -130,7 +130,7 @@ exports.getPostsBySociety = async (req, res) => {
     const userId = jsonWebToken.verifyToken(token)['id'];
 
     if (!society_id) {
-      return res.status(400).json({ error_message: "Missing society_id" });
+      return res.status(400).json({ error_message: "Missing society_id." });
     }
 
     const posts = await Post.find({ Society: society_id }).sort({ CreatedAt: -1 });
@@ -164,7 +164,7 @@ exports.getPostsBySociety = async (req, res) => {
     res.status(200).json({ data: postsWithDetails });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get Posts for this society" });
+    res.status(500).json({ error_message: "Failed to get Posts for this society." });
   }
 };
 
@@ -176,12 +176,12 @@ exports.unlikePost = async (req, res) => {
 
     const post = await Post.findOne({ ID: post_id });
     if (!post) {
-      return res.status(404).json({ error_message: "Post not found" });
+      return res.status(404).json({ error_message: "Post not found." });
     }
 
     const existingLike = await Like.findOne({ User: userId, Post: post._id.toString() });
     if (!existingLike) {
-      return res.status(400).json({ error_message: "User has not liked this post" });
+      return res.status(400).json({ error_message: "User has not liked this post." });
     }
 
     await Like.deleteOne({ _id: existingLike._id });
@@ -194,7 +194,7 @@ exports.unlikePost = async (req, res) => {
     res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to unlike post" });
+    res.status(500).json({ error_message: "Failed to unlike post." });
   }
 };
 
@@ -206,11 +206,11 @@ exports.likePost = async (req, res) => {
 
     const post = await Post.findOne({ ID: post_id });
     if (!post) {
-      return res.status(404).json({ error_message: "Post not found" });
+      return res.status(404).json({ error_message: "Post not found." });
     }
 
     const existingLike = await Like.findOne({ User: userId, Post: post._id.toString() });
-    if (existingLike) return res.status(400).json({ error_message: "User already liked this post" });
+    if (existingLike) return res.status(400).json({ error_message: "User already liked this post." });
 
     const newLike = new Like({ User: userId, Post: post._id.toString() });
     await newLike.save();
@@ -242,7 +242,7 @@ exports.likePost = async (req, res) => {
     res.status(201).json({ data: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to like post" });
+    res.status(500).json({ error_message: "Failed to like post." });
   }
 };
 
@@ -257,6 +257,6 @@ exports.getCommentsForPost = async (req, res) => {
     res.status(200).json({ data: comments });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error_message: "Failed to get comments" });
+    res.status(500).json({ error_message: "Failed to get comments." });
   }
 };
