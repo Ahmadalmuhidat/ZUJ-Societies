@@ -1,6 +1,5 @@
-const Comment = require("../models/comments");
-const User = require("../models/users");
 const Post = require("../models/posts");
+const User = require("../models/users");
 const jsonWebToken = require("../helpers/jsonWebToken");
 const serverSentEvents = require('../helpers/serverSentEvents');
 
@@ -10,26 +9,38 @@ exports.createComment = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = jsonWebToken.verifyToken(token)['id'];
 
-    const newComment = new Comment({
+    const { v4: uuidv4 } = require('uuid');
+    const newComment = {
+      ID: uuidv4(),
       Content: content,
-      Post: post_id,
-      User: userId
-    });
+      User: userId,
+      CreatedAt: new Date()
+    };
 
-    await newComment.save();
+    const result = await Post.updateOne(
+      { ID: post_id },
+      {
+        $push: { Comments: newComment },
+        $inc: { CommentsCount: 1 }
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error_message: "Post not found." });
+    }
 
     try {
       const post = await Post.findOne({ ID: post_id });
       if (post && post.User.toString() !== userId) {
         const user = await User.findOne({ ID: userId }).select('Name Photo');
-        
+
         const notification = {
           type: 'comment',
           title: 'New Comment',
           message: `${user?.Name || 'Someone'} commented on your post`,
           data: {
             commentId: newComment.ID,
-            postId: post._id.toString(),
+            postId: post_id,
             userId: userId
           },
           time: new Date().toISOString()
@@ -54,16 +65,24 @@ exports.deleteComment = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = jsonWebToken.verifyToken(token)['id'];
 
-    const comment = await Comment.findOne({ ID: comment_id });
-    if (!comment) {
+    const post = await Post.findOne({ "Comments.ID": comment_id });
+    if (!post) {
       return res.status(404).json({ error_message: "Comment not found." });
     }
 
+    const comment = post.Comments.find(c => c.ID === comment_id);
     if (comment.User !== userId) {
       return res.status(403).json({ error_message: "Not authorized to delete this comment." });
     }
 
-    const result = await Comment.deleteOne({ ID: comment_id });
+    const result = await Post.updateOne(
+      { "Comments.ID": comment_id },
+      {
+        $pull: { Comments: { ID: comment_id } },
+        $inc: { CommentsCount: -1 }
+      }
+    );
+
     res.status(200).json({ data: result });
   } catch (err) {
     console.error(err);
@@ -74,8 +93,13 @@ exports.deleteComment = async (req, res) => {
 exports.getCommentsByPost = async (req, res) => {
   try {
     const { post_id } = req.query;
-    const comments = await Comment.find({ Post: post_id }).lean();
+    const post = await Post.findOne({ ID: post_id }).lean();
 
+    if (!post) {
+      return res.status(404).json({ error_message: "Post not found." });
+    }
+
+    const comments = post.Comments || [];
     const userIds = comments.map(c => c.User);
     const users = await User.find({ ID: { $in: userIds } }).select("ID Name Photo").lean();
 

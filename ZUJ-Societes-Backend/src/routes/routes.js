@@ -20,7 +20,7 @@ router.get('/users/info', authMiddleware.checkUserLoggedIn, userController.getUs
 router.get('/users/profile', authMiddleware.checkUserLoggedIn, userController.getUserProfileInformation);
 router.put('/users/profile', authMiddleware.checkUserLoggedIn, userController.updateProfile);
 router.get('/users/profile/public', userController.getUserPublicProfile);
-router.get('/users/search',  authMiddleware.checkUserLoggedIn, userController.searchUsers);
+router.get('/users/search', authMiddleware.checkUserLoggedIn, userController.searchUsers);
 // router.delete('/users/delete_user', auth_mdiddleware.checkUserLoggedIn, userController.deleteUser);
 router.get('/users/events', eventsController.getEventsAttendedByUser);
 router.get('/users/events/status', authMiddleware.checkUserLoggedIn, eventsController.getUserEventStatus);
@@ -47,6 +47,7 @@ router.put('/societies/members/roles', authMiddleware.checkUserLoggedIn, societi
 router.post('/societies/leave', authMiddleware.checkUserLoggedIn, societiesController.leaveSociety);
 router.post('/societies/members/invites', authMiddleware.checkUserLoggedIn, societiesController.inviteMemberToSociety);
 router.post('/societies/members/invites/respond', authMiddleware.checkUserLoggedIn, societiesController.respondToInvitation);
+router.post('/societies/members/invites/check-status', authMiddleware.checkUserLoggedIn, societiesController.checkInvitationStatus);
 router.get('/societies/members/invites', authMiddleware.checkUserLoggedIn, societiesController.getSentInvitations);
 router.delete('/societies/members/invites/cancel', authMiddleware.checkUserLoggedIn, societiesController.cancelInvitation);
 router.get('/societies/events', eventsController.getEventsBySociety);

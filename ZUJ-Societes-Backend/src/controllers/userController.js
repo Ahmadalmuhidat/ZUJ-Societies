@@ -2,9 +2,9 @@ const User = require("../models/users");
 const Post = require("../models/posts");
 const Event = require("../models/events");
 const Society = require("../models/societies");
-const Likes = require("../models/likes");
+// const Likes = require("../models/likes");
 const jsonWebToken = require("../helpers/jsonWebToken");
-const SocietyMember = require("../models/societyMembers");
+// const SocietyMember = require("../models/societyMembers");
 
 exports.searchUsers = async (req, res) => {
   try {
@@ -121,8 +121,11 @@ exports.getUserPublicProfile = async (req, res) => {
       return res.status(404).json({ error_message: 'User not found' });
     }
 
-    const [postCount, eventCount, societyCount, likesCount] = await Promise.all([
-      Likes.countDocuments({ User: userId }),
+    // Count likes from all posts by this user
+    const userPosts = await Post.find({ User: userId }).select('Likes').lean();
+    const likesCount = userPosts.reduce((sum, post) => sum + (post.Likes?.length || 0), 0);
+
+    const [postCount, eventCount, societyCount] = await Promise.all([
       Post.countDocuments({ User: userId }),
       Event.countDocuments({ User: userId }),
       Society.countDocuments({ User: userId })
@@ -175,20 +178,15 @@ exports.getSocietiesByUserPublic = async (req, res) => {
       return res.status(400).json({ error_message: 'user_id is required.' });
     }
 
-    const societies = await Society.find({ User: userID }, 'ID Name Category Description Image CreatedAt')
+    const societies = await Society.find({ User: userID }, 'ID Name Category Description Image CreatedAt Members')
       .sort({ CreatedAt: -1 })
       .limit(Math.min(parseInt(limit || '20', 10), 50))
       .lean();
 
-    const societiesWithCounts = await Promise.all(
-      societies.map(async (society) => {
-        const memberCount = await SocietyMember.countDocuments({ Society: society.ID });
-        return {
-          ...society,
-          Member_Count: memberCount
-        };
-      })
-    );
+    const societiesWithCounts = societies.map(society => ({
+      ...society,
+      Member_Count: society.Members?.length || 0
+    }));
 
     res.status(200).json({ data: societiesWithCounts });
   } catch (err) {

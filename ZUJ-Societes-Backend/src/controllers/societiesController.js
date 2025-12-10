@@ -1,9 +1,5 @@
 const Society = require("../models/societies");
-const SocietyMember = require("../models/societyMembers");
-const SocietyJoinRequest = require("../models/societyJoinRequests");
-const SocietyInvite = require('../models/SocietyInvite');
 const Notifications = require("../models/notifications");
-const Member = require("../models/societyMembers");
 const Post = require("../models/posts");
 const Event = require("../models/events");
 const User = require("../models/users");
@@ -18,17 +14,18 @@ exports.getSocietyInformation = async (req, res) => {
       {
         ID: society_id
       },
-      'Name Description Image Category Privacy Permissions Notifications'
+      'Name Description Image Category Privacy Permissions Notifications Members'
     );
 
     if (!society) {
       return res.status(404).json({ error_message: "Society not found." });
     }
 
-    const [postsCount, eventsCount, membersCount] = await Promise.all([
-      Event.countDocuments({ Society: society_id }),
+    const membersCount = society.Members?.length || 0;
+
+    const [postsCount, eventsCount] = await Promise.all([
       Post.countDocuments({ Society: society_id }),
-      Member.countDocuments({ Society: society_id })
+      Event.countDocuments({ Society: society_id })
     ]);
 
     res.status(200).json({
@@ -57,7 +54,7 @@ exports.inviteMemberToSociety = async (req, res) => {
       return res.status(404).json({ error_message: 'Society not found.' });
     }
 
-    const inviterMember = await SocietyMember.findOne({ Society: SocietyID, User: userID });
+    const inviterMember = society.Members.find(m => m.User === userID);
     if (!inviterMember) {
       return res.status(403).json({ error_message: 'You are not a member of this society.' });
     }
@@ -74,30 +71,33 @@ exports.inviteMemberToSociety = async (req, res) => {
       return res.status(403).json({ error_message: 'You do not have permission to invite members.' });
     }
 
-    const isAlreadyMember = await SocietyMember.findOne({ Society: SocietyID, User: InviteeID });
+    const isAlreadyMember = society.Members?.some(m => m.User === InviteeID);
     if (isAlreadyMember) {
       return res.status(400).json({ error_message: 'User is already a member of this society.' });
     }
 
-    const existingInvite = await SocietyInvite.findOne({
-      Society: SocietyID,
-      Invitee: InviteeID,
-      Status: 'pending'
-    });
+    const existingInvite = society.Invites.find(inv =>
+      inv.Invitee === InviteeID && inv.Status === 'pending'
+    );
 
     if (existingInvite) {
       return res.status(400).json({ error_message: 'User has already been invited.' });
     }
 
-    const invite = new SocietyInvite({
+    const { v4: uuidv4 } = require('uuid');
+    const invite = {
+      ID: uuidv4(),
       Society: SocietyID,
       Inviter: userID,
       Invitee: InviteeID,
       Status: 'pending',
       CreatedAt: new Date()
-    });
+    };
 
-    await invite.save();
+    await Society.updateOne(
+      { ID: SocietyID },
+      { $push: { Invites: invite } }
+    );
 
     const notification = {
       type: 'invitation',
@@ -126,7 +126,12 @@ exports.respondToInvitation = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userID = JsonWebToken.verifyToken(token)['id'];
 
-    const invitation = await SocietyInvite.findOne({ ID: invitation_id, Invitee: userID });
+    const society = await Society.findOne({ "Invites.ID": invitation_id });
+    if (!society) {
+      return res.status(404).json({ error_message: 'Society not found.' });
+    }
+
+    const invitation = society.Invites.find(inv => inv.ID === invitation_id && inv.Invitee === userID);
     if (!invitation) {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
@@ -135,18 +140,27 @@ exports.respondToInvitation = async (req, res) => {
     }
 
     if (response === 'accept') {
-      const newMember = new SocietyMember({
-        Society: invitation.Society,
+      const { v4: uuidv4 } = require('uuid');
+      const newMember = {
+        ID: uuidv4(),
         User: userID,
-        Role: 'member'
-      });
-      await newMember.save();
-      invitation.Status = 'accepted';
-      await invitation.save();
+        Role: 'member',
+        JoinedAt: new Date()
+      };
+
+      await Society.updateOne(
+        { "Invites.ID": invitation_id },
+        {
+          $push: { Members: newMember },
+          $set: { "Invites.$.Status": 'accepted' }
+        }
+      );
       res.status(200).json({ data: invitation });
     } else if (response === 'decline') {
-      invitation.Status = 'declined';
-      await invitation.save();
+      await Society.updateOne(
+        { "Invites.ID": invitation_id },
+        { $set: { "Invites.$.Status": 'declined' } }
+      );
       res.status(200).json({ data: invitation });
     } else {
       res.status(400).json({ error_message: 'Invalid response. Must be "accept" or "decline".' });
@@ -157,18 +171,46 @@ exports.respondToInvitation = async (req, res) => {
   }
 };
 
+exports.checkInvitationStatus = async (req, res) => {
+  try {
+    const { invitation_id } = req.body;
+    const token = req.headers['authorization']?.split(' ')[1];
+    const userID = JsonWebToken.verifyToken(token)['id'];
+
+    const society = await Society.findOne({ "Invites.ID": invitation_id });
+    if (!society) {
+      return res.status(404).json({ error_message: 'Invitation not found.' });
+    }
+
+    const invitation = society.Invites.find(inv => inv.ID === invitation_id && inv.Invitee === userID);
+    if (!invitation) {
+      return res.status(404).json({ error_message: 'Invitation not found.' });
+    }
+
+    res.status(200).json({ status: invitation.Status });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error_message: 'Failed to check invitation status.' });
+  }
+};
+
 exports.getSentInvitations = async (req, res) => {
   try {
     const { society_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userID = JsonWebToken.verifyToken(token)['id'];
 
-    const member = await SocietyMember.findOne({ Society: society_id, User: userID });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: 'Society not found.' });
+    }
+
+    const member = society.Members.find(m => m.User === userID);
     if (!member || !['admin', 'moderator'].includes(member.Role)) {
       return res.status(403).json({ error_message: 'You do not have permission to view invitations.' });
     }
 
-    const invitations = await SocietyInvite.find({ Society: society_id }).sort({ CreatedAt: -1 });
+    const invitations = society.Invites.sort((a, b) => b.CreatedAt - a.CreatedAt);
     const inviteeIDs = invitations.map(invite => invite.Invitee);
 
     const users = await User.find({ ID: { $in: inviteeIDs } }).select('ID Name Email Photo');
@@ -200,22 +242,25 @@ exports.cancelInvitation = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userID = JsonWebToken.verifyToken(token)['id'];
 
-    const invitation = await SocietyInvite.findOne({ ID: invitation_id });
-    if (!invitation) {
+    const society = await Society.findOne({ "Invites.ID": invitation_id });
+    if (!society) {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
 
-    const member = await SocietyMember.findOne({ Society: invitation.Society, User: userID });
+    const member = society.Members.find(m => m.User === userID);
     if (!member || !['admin', 'moderator'].includes(member.Role)) {
       return res.status(403).json({ error_message: 'You do not have permission to cancel this invitation.' });
     }
 
-    await SocietyInvite.deleteOne({ ID: invitation.ID });
+    await Society.updateOne(
+      { "Invites.ID": invitation_id },
+      { $pull: { Invites: { ID: invitation_id } } }
+    );
     await Notifications.deleteOne({
       type: 'invitation',
-      Data: { inviteId: invitation.ID }
+      Data: { inviteId: invitation_id }
     });
-    res.status(200).json({ data: invitation });
+    res.status(200).json({ data: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error_message: 'Failed to cancel invitation.' });
@@ -225,21 +270,16 @@ exports.cancelInvitation = async (req, res) => {
 exports.getAllSocieties = async (req, res) => {
   try {
     const societies = await Society.find({ 'Privacy.visibility': { $ne: 'private' } });
-    const societiesWithCount = await Promise.all(
-      societies.map(async (society) => {
-        const memberCount = await SocietyMember.countDocuments({ Society: society.ID });
-        return {
-          ID: society.ID,
-          Name: society.Name,
-          Description: society.Description,
-          Category: society.Category,
-          Image: society.Image,
-          Member_Count: memberCount,
-          CreatedAt: society.CreatedAt,
-          User: society.User
-        };
-      })
-    );
+    const societiesWithCount = societies.map(society => ({
+      ID: society.ID,
+      Name: society.Name,
+      Description: society.Description,
+      Category: society.Category,
+      Image: society.Image,
+      Member_Count: society.Members.length,
+      CreatedAt: society.CreatedAt,
+      User: society.User
+    }));
 
     res.status(200).json({ data: societiesWithCount });
   } catch (err) {
@@ -293,13 +333,19 @@ exports.createSociety = async (req, res) => {
 
     await newSociety.save();
 
-    const newMember = new SocietyMember({
-      Society: newSociety.ID,
+    const { v4: uuidv4 } = require('uuid');
+    const newMember = {
+      ID: uuidv4(),
       User: userId,
-      Role: "admin"
-    });
+      Role: "admin",
+      JoinedAt: new Date()
+    };
 
-    await newMember.save();
+    await Society.updateOne(
+      { ID: newSociety.ID },
+      { $push: { Members: newMember } }
+    );
+
     res.status(201).json({ data: newSociety.ID });
 
   } catch (err) {
@@ -345,24 +391,20 @@ exports.getSocietiesByUser = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
     const createdSocieties = await Society.find({ User: userId });
-    const memberships = await SocietyMember.find({ User: userId }).select("Society Role");
-    const memberSocietyIds = memberships.map(m => m.Society);
-    const memberSocieties = await Society.find({ ID: { $in: memberSocietyIds } });
-
-    const societiesWithCounts = await Promise.all(
-      [...createdSocieties, ...memberSocieties].map(async (society) => {
-        const memberCount = await SocietyMember.countDocuments({ Society: society.ID });
-        return {
-          ...society.toObject(),
-          Member_Count: memberCount
-        };
-      })
+    const allSocieties = await Society.find({});
+    const memberSocieties = allSocieties.filter(s =>
+      s.Members?.some(m => m.User === userId && s.User !== userId)
     );
+
+    const societiesWithCounts = [...createdSocieties, ...memberSocieties].map(society => ({
+      ...society.toObject(),
+      Member_Count: society.Members.length
+    }));
 
     const combined = [
       ...societiesWithCounts.filter(s => createdSocieties.some(cs => cs.ID === s.ID)).map(s => ({ ...s, Role: 'creator' })),
       ...societiesWithCounts.filter(s => memberSocieties.some(ms => ms.ID === s.ID)).map(s => {
-        const membership = memberships.find(m => m.Society === s.ID);
+        const membership = s.Members.find(m => m.User === userId);
         return { ...s, Role: membership?.Role || null };
       })
     ];
@@ -379,16 +421,16 @@ exports.joinRequest = async (req, res) => {
     const { society_id } = req.body;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
-    const existingRequest = await SocietyJoinRequest.findOne({
-      User: userId,
-      Society: society_id,
-      Status: { $in: ["pending", "approved"] }
-    });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: 'Society not found.' });
+    }
 
-    const isMember = await SocietyMember.findOne({
-      User: userId,
-      Society: society_id
-    });
+    const existingRequest = society.JoinRequests.find(req =>
+      req.User === userId && ["pending", "approved"].includes(req.Status)
+    );
+
+    const isMember = society.Members?.some(m => m.User === userId);
 
     if (isMember) {
       return res.status(400).json({ error_message: "You are already a member of this society." });
@@ -398,23 +440,26 @@ exports.joinRequest = async (req, res) => {
       return res.status(400).json({ error_message: "You have already requested to join this society." });
     }
 
-    const newRequest = new SocietyJoinRequest({
-      Society: society_id,
+    const { v4: uuidv4 } = require('uuid');
+    const newRequest = {
+      ID: uuidv4(),
       User: userId,
-      Status: "pending"
-    });
-    const saved = await newRequest.save();
+      Status: "pending",
+      RequestedAt: new Date()
+    };
+
+    await Society.updateOne(
+      { ID: society_id },
+      { $push: { JoinRequests: newRequest } }
+    );
 
     try {
       const society = await Society.findOne({ ID: society_id });
       const user = await User.findOne({ ID: userId }).select('Name Photo');
 
-      const admins = await SocietyMember.find({
-        Society: society_id,
-        Role: { $in: ['admin', 'creator'] }
-      }).select('User');
-
-      const adminUserIds = admins.map(admin => admin.User);
+      const adminUserIds = society.Members
+        .filter(m => ['admin', 'creator'].includes(m.Role))
+        .map(m => m.User);
 
       if (adminUserIds.length > 0) {
         const notification = {
@@ -422,7 +467,7 @@ exports.joinRequest = async (req, res) => {
           title: 'New Join Request',
           message: `${user?.Name || 'Someone'} wants to join ${society?.Name || 'your society'}`,
           data: {
-            requestId: saved.ID,
+            requestId: newRequest.ID,
             societyId: society_id,
             userId: userId,
             societyName: society?.Name
@@ -436,7 +481,7 @@ exports.joinRequest = async (req, res) => {
       console.error('Failed to send join request notification:', notificationError);
     }
 
-    res.status(201).json({ data: saved });
+    res.status(201).json({ data: newRequest });
 
   } catch (err) {
     console.error(err);
@@ -450,11 +495,14 @@ exports.checkJoinRequest = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
 
-    const existingRequest = await SocietyJoinRequest.findOne({
-      User: userId,
-      Society: society_id,
-      Status: { $in: ["pending", "approved", "rejected"] }
-    });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: 'Society not found.' });
+    }
+
+    const existingRequest = society.JoinRequests.find(req =>
+      req.User === userId && ["pending", "approved", "rejected"].includes(req.Status)
+    );
 
     if (!existingRequest) {
       return res.status(200).json({ data: "not_found" });
@@ -470,21 +518,32 @@ exports.checkJoinRequest = async (req, res) => {
 exports.approveJoinRequest = async (req, res) => {
   try {
     const { request_id } = req.body;
-    const request = await SocietyJoinRequest.findOne({ ID: request_id });
+    const society = await Society.findOne({ "JoinRequests.ID": request_id });
 
+    if (!society) {
+      return res.status(404).json({ error_message: "Request not found." });
+    }
+
+    const request = society.JoinRequests.find(r => r.ID === request_id);
     if (!request) {
       return res.status(404).json({ error_message: "Request not found." });
     }
 
-    request.Status = 'approved';
-    await request.save();
-
-    const newMember = new SocietyMember({
-      Society: request.Society,
+    const { v4: uuidv4 } = require('uuid');
+    const newMember = {
+      ID: uuidv4(),
       User: request.User,
-      Role: "member"
-    });
-    await newMember.save();
+      Role: "member",
+      JoinedAt: new Date()
+    };
+
+    await Society.updateOne(
+      { "JoinRequests.ID": request_id },
+      {
+        $set: { "JoinRequests.$.Status": 'approved' },
+        $push: { Members: newMember }
+      }
+    );
 
     try {
       const society = await Society.findOne({ ID: request.Society });
@@ -516,14 +575,21 @@ exports.approveJoinRequest = async (req, res) => {
 exports.rejectJoinRequest = async (req, res) => {
   try {
     const { request_id } = req.body;
-    const request = await SocietyJoinRequest.findOne({ ID: request_id });
+    const society = await Society.findOne({ "JoinRequests.ID": request_id });
 
+    if (!society) {
+      return res.status(404).json({ error_message: "Request not found." });
+    }
+
+    const request = society.JoinRequests.find(r => r.ID === request_id);
     if (!request) {
       return res.status(404).json({ error_message: "Request not found." });
     }
 
-    request.Status = 'rejected';
-    await request.save();
+    await Society.updateOne(
+      { "JoinRequests.ID": request_id },
+      { $set: { "JoinRequests.$.Status": 'rejected' } }
+    );
 
     try {
       const society = await Society.findOne({ ID: request.Society });
@@ -555,7 +621,12 @@ exports.rejectJoinRequest = async (req, res) => {
 exports.getAllJoinRequests = async (req, res) => {
   try {
     const { society_id } = req.query;
-    const requests = await SocietyJoinRequest.find({ Society: society_id });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const requests = society.JoinRequests;
     const userIds = requests.map(r => r.User);
     const users = await User.find({ ID: { $in: userIds } }).select("ID Name Email Photo");
 
@@ -581,7 +652,12 @@ exports.getAllJoinRequests = async (req, res) => {
 exports.getAllMembers = async (req, res) => {
   try {
     const { society_id } = req.query;
-    const members = await SocietyMember.find({ Society: society_id });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const members = society.Members;
     const userIds = members.map(m => m.User);
     const users = await User.find({ ID: { $in: userIds } }).select("ID Name Email Photo");
     const data = members.map(member => {
@@ -606,27 +682,28 @@ exports.removeMember = async (req, res) => {
     const { society_id, user_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
-    const isAdmin = await SocietyMember.exists({
-      User: userId,
-      Society: society_id,
-      Role: 'admin'
-    });
+
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const isAdmin = society.Members?.some(m => m.User === userId && m.Role === 'admin');
 
     if (!isAdmin) {
       return res.status(403).json({ error_message: "You don't have permission to remove the member." });
     }
 
-    const isOwner = await Society.findOne({ ID: society_id });
-    if (isOwner && isOwner.User === user_id) {
+    if (society.User === user_id) {
       return res.status(400).json({ error_message: "You cannot remove the owner of the society." });
     }
 
-    const result = await SocietyMember.deleteOne({
-      Society: society_id,
-      User: user_id
-    });
+    await Society.updateOne(
+      { ID: society_id },
+      { $pull: { Members: { User: user_id } } }
+    );
 
-    res.status(204).json({ data: result });
+    res.status(204).json({ data: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to remove member." });
@@ -638,7 +715,12 @@ exports.checkMembership = async (req, res) => {
     const { society_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
-    const isMember = await SocietyMember.exists({ User: userId, Society: society_id });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const isMember = society.Members?.some(m => m.User === userId);
     res.status(200).json({ data: !!isMember });
   } catch (err) {
     console.error(err);
@@ -651,11 +733,13 @@ exports.checkAdmin = async (req, res) => {
     const { society_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
-    const isAdmin = await SocietyMember.exists({
-      User: userId,
-      Society: society_id,
-      Role: 'admin'
-    });
+    const society = await Society.findOne({ ID: society_id });
+
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const isAdmin = society.Members?.some(m => m.User === userId && m.Role === 'admin');
 
     res.status(200).json({ data: !!isAdmin });
   } catch (err) {
@@ -734,24 +818,25 @@ exports.leaveSociety = async (req, res) => {
       return res.status(400).json({ error_message: "Society ID is required." });
     }
 
-    const isMember = await SocietyMember.findOne({ User: userID, Society: society_id });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    const isMember = society.Members?.some(m => m.User === userID);
     if (!isMember) {
       return res.status(404).json({ error_message: "You are not a member of this society." });
     }
 
-    const isOwner = await Society.findOne({ ID: society_id });
-    if (isOwner && isOwner.User === userID) {
+    const isOwner = society.User === userID;
+    if (isOwner) {
       return res.status(400).json({ error_message: "Society creators cannot leave. Please transfer ownership or delete the society instead." });
     }
 
-    const result = await SocietyMember.deleteOne({
-      User: userID,
-      Society: society_id
-    });
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ error_message: "Membership not found." });
-    }
+    await Society.updateOne(
+      { ID: society_id },
+      { $pull: { Members: { User: userID } } }
+    );
 
     res.status(200).json({ message: "Successfully left the society." });
   } catch (err) {

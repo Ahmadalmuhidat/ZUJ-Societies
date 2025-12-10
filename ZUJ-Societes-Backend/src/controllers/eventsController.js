@@ -1,9 +1,6 @@
 const Event = require("../models/events");
 const User = require("../models/users");
 const Society = require("../models/societies");
-const SocietyMember = require("../models/societyMembers");
-const EventAttendance = require("../models/eventAttendance");
-const EventInteractions = require("../models/eventInteractions");
 const jsonWebToken = require("../helpers/jsonWebToken");
 const mailer = require("../services/mailer");
 const serverSentEvents = require('../helpers/serverSentEvents');
@@ -14,7 +11,11 @@ exports.getAllEvents = async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     const events = await Event.find(
-      { CreatedAt: { $gte: today } },
+      {
+        CreatedAt: {
+          $gte: today
+        }
+      },
       "-__v"
     ).lean();
 
@@ -64,7 +65,7 @@ exports.createEvent = async (req, res) => {
     }
 
     const whoCanCreateEvent = society.Permissions?.whoCanCreateEvents || 'all-members';
-    const membership = await SocietyMember.findOne({ Society: society_id, User: userId });
+    const membership = society.Members.find(m => m.User === userId);
     const userRole = membership?.Role;
 
     const isAllowedToCreateEvents =
@@ -95,8 +96,7 @@ exports.createEvent = async (req, res) => {
       const society = await Society.findOne({ ID: society_id });
       const eventCreator = await User.findOne({ ID: userId }).select('Name Photo');
 
-      const members = await SocietyMember.find({ Society: society_id, User: { $ne: userId } }).select("User").lean();
-      const memberUserIds = members.map(member => member.User);
+      const memberUserIds = society.Members.filter(member => member.User !== userId).map(m => m.User);
 
       if (memberUserIds.length > 0) {
         const notification = {
@@ -144,10 +144,8 @@ exports.deleteEvent = async (req, res) => {
     let isAdminOrModerator = false;
     if (event.Society) {
       try {
-        const member = await SocietyMember.findOne({
-          Society: event.Society,
-          User: userId
-        });
+        const society = await Society.findOne({ ID: event.Society });
+        const member = society?.Members.find(m => m.User === userId);
         isAdminOrModerator = member && (member.Role === 'admin' || member.Role === 'moderator');
       } catch (err) {
         console.error('Error checking admin/moderator status:', err);
@@ -214,10 +212,13 @@ exports.getEventStats = async (req, res) => {
       return res.status(400).json({ error_message: "Event ID is required." });
     }
 
-    const [attendingCount, shareCount] = await Promise.all([
-      EventAttendance.countDocuments({ Event: event_id, Status: 'attending' }),
-      EventInteractions.countDocuments({ Event: event_id, Action: 'share' })
-    ]);
+    const event = await Event.findOne({ ID: event_id });
+    if (!event) {
+      return res.status(404).json({ error_message: "Event not found." });
+    }
+
+    const attendingCount = event.Attendance.filter(a => a.Status === 'attending').length;
+    const shareCount = event.Interactions.filter(i => i.Action === 'share').length;
 
     res.status(200).json({
       data: {
@@ -246,19 +247,18 @@ exports.toggleEventAttendance = async (req, res) => {
       return res.status(404).json({ error_message: "Event not found." });
     }
 
-    let attendance = await EventAttendance.findOne({ Event: event_id, User: userId });
+    const existingAttendance = event.Attendance.find(a => a.User === userId);
 
-    if (attendance) {
-      attendance.Status = status;
-      attendance.UpdatedAt = new Date();
-      await attendance.save();
+    if (existingAttendance) {
+      await Event.updateOne(
+        { ID: event_id, "Attendance.User": userId },
+        { $set: { "Attendance.$.Status": status, "Attendance.$.UpdatedAt": new Date() } }
+      );
     } else {
-      attendance = new EventAttendance({
-        Event: event_id,
-        User: userId,
-        Status: status
-      });
-      await attendance.save();
+      await Event.updateOne(
+        { ID: event_id },
+        { $push: { Attendance: { User: userId, Status: status, UpdatedAt: new Date() } } }
+      );
     }
 
     res.status(200).json({ data: true });
@@ -278,12 +278,11 @@ exports.recordEventShare = async (req, res) => {
       return res.status(400).json({ error_message: "Event ID is required." });
     }
 
-    const shareRecord = new EventInteractions({
-      Event: event_id,
-      User: userId,
-      Action: 'share'
-    });
-    await shareRecord.save();
+    const { v4: uuidv4 } = require('uuid');
+    await Event.updateOne(
+      { ID: event_id },
+      { $push: { Interactions: { ID: uuidv4(), User: userId, Action: 'share', CreatedAt: new Date() } } }
+    );
 
     res.status(200).json({ data: true });
   } catch (err) {
@@ -303,7 +302,8 @@ exports.getUserEventStatus = async (req, res) => {
       return res.status(400).json({ error_message: "Event ID is required." });
     }
 
-    const attendance = await EventAttendance.findOne({ Event: event_id, User: userId });
+    const event = await Event.findOne({ ID: event_id });
+    const attendance = event?.Attendance.find(a => a.User === userId);
 
     res.status(200).json({
       data: {
@@ -323,19 +323,14 @@ exports.getEventsAttendedByUser = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userID = jsonWebToken.verifyToken(token)['id'];
 
-    const attendanceRecords = await EventAttendance.find({
-      User: userID,
-      Status: 'attending'
+    const events = await Event.find({
+      "Attendance.User": userID,
+      "Attendance.Status": "attending"
     }).limit(parseInt(limit) || 10).lean();
 
-    if (attendanceRecords.length === 0) {
+    if (events.length === 0) {
       return res.status(200).json({ data: [] });
     }
-
-    const eventIds = attendanceRecords.map(record => record.Event);
-    const events = await Event.find({
-      ID: { $in: eventIds }
-    }).lean();
 
     const societyIds = [...new Set(events.map(e => e.Society).filter(Boolean))];
     const societies = await Society.find({

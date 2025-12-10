@@ -1,9 +1,6 @@
-const Like = require('../models/likes');
 const Post = require('../models/posts');
 const User = require("../models/users");
 const Society = require("../models/societies");
-const Comment = require('../models/comments');
-const SocietyMember = require("../models/societyMembers");
 const jsonWebToken = require("../helpers/jsonWebToken");
 const serverSentEvents = require('../helpers/serverSentEvents');
 
@@ -12,23 +9,19 @@ exports.getAllPosts = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = jsonWebToken.verifyToken(token)['id'];
 
-    const societyMemberships = await SocietyMember.find({ User: userId }).select("Society");
-    const societyIds = societyMemberships.map(member => member.Society);
+    const allSocieties = await Society.find({}).select("ID Name Members").lean();
+    const userSocieties = allSocieties.filter(society => society.Members?.some(member => member.User === userId));
+    const societyIds = userSocieties.map(society => society.ID);
 
     const posts = await Post.find({ Society: { $in: societyIds } }).sort({ CreatedAt: -1 }).lean();
     const userIds = [...new Set(posts.map(post => post.User.toString()))];
-    const postIds = posts.map(post => post._id.toString());
 
-    const [users, societies, likes] = await Promise.all([
-      User.find({ ID: { $in: userIds } }).select("ID Name Photo").lean(),
-      Society.find({ ID: { $in: societyIds } }).select("ID Name").lean(),
-      Like.find({ User: userId, Post: { $in: postIds } }).lean()
-    ]);
+    const users = await User.find({ ID: { $in: userIds } }).select("ID Name Photo").lean();
 
     const postsWithDetails = posts.map(post => {
       const postUser = users.find(user => user.ID === post.User);
-      const postSociety = societies.find(society => society.ID === post.Society);
-      const isLiked = likes.some(like => like.Post.toString() === post._id.toString());
+      const postSociety = userSocieties.find(society => society.ID === post.Society);
+      const isLiked = post.Likes?.some(like => like.User === userId) || false;
 
       const likeCount = post.LikesCount || 0;
 
@@ -66,7 +59,7 @@ exports.createPost = async (req, res) => {
     }
 
     const whoCanPost = society.Permissions?.whoCanPost || 'all-members';
-    const membership = await SocietyMember.findOne({ Society: society_id, User: userId });
+    const membership = society.Members?.find(m => m.User === userId); // Added optional chaining here
     const userRole = membership?.Role;
 
     const isAllowedToPost =
@@ -136,16 +129,11 @@ exports.getPostsBySociety = async (req, res) => {
     const posts = await Post.find({ Society: society_id }).sort({ CreatedAt: -1 });
     const userIds = [...new Set(posts.map(p => p.User.toString()))];
     const users = await User.find({ ID: { $in: userIds } }).select("ID Name Photo").lean();
-    const postIds = posts.map(p => p._id.toString());
-    const likes = await Like.find({ Post: { $in: postIds } }).lean();
-    const userLikes = new Set(
-      likes.filter(like => like.User.toString() === userId).map(like => like.Post.toString())
-    );
 
     const postsWithDetails = posts.map(post => {
       const postUser = users.find(u => u.ID === post.User);
       const likeCount = post.LikesCount || 0;
-      const isLiked = userLikes.has(post._id.toString()) ? 1 : 0;
+      const isLiked = post.Likes?.some(like => like.User === userId) ? 1 : 0;
 
       return {
         ID: post.ID,
@@ -179,16 +167,17 @@ exports.unlikePost = async (req, res) => {
       return res.status(404).json({ error_message: "Post not found." });
     }
 
-    const existingLike = await Like.findOne({ User: userId, Post: post._id.toString() });
+    const existingLike = post.Likes?.find(like => like.User === userId);
     if (!existingLike) {
       return res.status(400).json({ error_message: "User has not liked this post." });
     }
 
-    await Like.deleteOne({ _id: existingLike._id });
-
     await Post.updateOne(
       { ID: post_id },
-      { $inc: { LikesCount: -1 } }
+      {
+        $pull: { Likes: { User: userId } },
+        $inc: { LikesCount: -1 }
+      }
     );
 
     res.status(200).json({ data: true });
@@ -209,18 +198,28 @@ exports.likePost = async (req, res) => {
       return res.status(404).json({ error_message: "Post not found." });
     }
 
-    const existingLike = await Like.findOne({ User: userId, Post: post._id.toString() });
+    const existingLike = post.Likes?.find(like => like.User === userId);
     if (existingLike) return res.status(400).json({ error_message: "User already liked this post." });
 
-    const newLike = new Like({ User: userId, Post: post._id.toString() });
-    await newLike.save();
+    const { v4: uuidv4 } = require('uuid');
+    const newLike = {
+      ID: uuidv4(),
+      User: userId,
+      CreatedAt: new Date()
+    };
 
-    await Post.updateOne({ ID: post_id }, { $inc: { LikesCount: 1 } });
+    await Post.updateOne(
+      { ID: post_id },
+      {
+        $push: { Likes: newLike },
+        $inc: { LikesCount: 1 }
+      }
+    );
 
     try {
       if (post.User.toString() !== userId) {
         const user = await User.findOne({ ID: userId }).select('Name Photo');
-        
+
         const notification = {
           type: 'like',
           title: 'New Like',
@@ -250,10 +249,12 @@ exports.getCommentsForPost = async (req, res) => {
   try {
     const { post_id } = req.body;
 
-    const comments = await Comment.find({ Post: post_id })
-      .sort({ CreatedAt: -1 })
-      .lean();
+    const post = await Post.findOne({ ID: post_id }).lean();
+    if (!post) {
+      return res.status(404).json({ error_message: "Post not found." });
+    }
 
+    const comments = post.Comments || [];
     res.status(200).json({ data: comments });
   } catch (err) {
     console.error(err);

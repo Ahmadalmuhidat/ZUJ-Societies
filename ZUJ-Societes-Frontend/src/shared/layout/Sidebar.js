@@ -49,6 +49,7 @@ export default function Sidebar() {
 
   const navItems = [
     { name: 'Home', path: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+    { name: 'Notifications', path: '/notifications', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', showBadge: true },
     { name: 'Trending', path: '/trending', icon: 'M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z' },
     { name: 'Events', path: '/events', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
     { name: 'Societies', path: '/societies', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
@@ -65,7 +66,7 @@ export default function Sidebar() {
     <>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -92,35 +93,14 @@ export default function Sidebar() {
                 <p className="text-xs text-gray-500">Student Platform</p>
               </div>
             </Link>
-            <div className="flex items-center gap-2">
-              {/* Notification Bell */}
-              {isAuthenticated && (
-                <div className="relative">
-                  <Link 
-                    to="/notifications" 
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors block"
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5v-5a7.5 7.5 0 1 0-15 0v5h5l-5 5-5-5h5v-5a7.5 7.5 0 1 1 15 0v5z" />
-                    </svg>
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </div>
-              )}
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
           {/* Search */}
@@ -148,29 +128,33 @@ export default function Sidebar() {
             <div className="mb-3">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Main Menu</h3>
             </div>
-            {navItems.map(({ name, path, icon }) => (
+            {navItems.map(({ name, path, icon, showBadge }) => (
               <Link
                 key={path}
                 to={path}
                 onClick={() => setSidebarOpen(false)}
                 className={`
-                  flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group
+                  flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group relative
                   ${location.pathname === path
                     ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 shadow-sm'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
               >
-                <div className={`w-5 h-5 p-1 rounded-lg transition-colors ${
-                  location.pathname === path 
-                    ? 'bg-blue-100' 
-                    : 'bg-gray-100 group-hover:bg-gray-200'
-                }`}>
+                <div className={`w-5 h-5 p-1 rounded-lg transition-colors ${location.pathname === path
+                  ? 'bg-blue-100'
+                  : 'bg-gray-100 group-hover:bg-gray-200'
+                  }`}>
                   <svg className={`w-3 h-3 ${location.pathname === path ? 'text-blue-600' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
                   </svg>
                 </div>
                 {name}
+                {showBadge && isAuthenticated && unreadCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 min-w-[20px] px-1.5 flex items-center justify-center font-semibold">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
                 {location.pathname === path && (
                   <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full"></div>
                 )}
@@ -260,17 +244,18 @@ export default function Sidebar() {
             </div>
           </div>
         </div>
-      </aside>
+      </aside >
 
       {/* Mobile menu button */}
-      <button
-        onClick={() => setSidebarOpen(true)}
+      < button
+        onClick={() => setSidebarOpen(true)
+        }
         className="fixed top-4 left-4 z-40 lg:hidden p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
       >
         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-      </button>
+      </button >
     </>
   );
 }

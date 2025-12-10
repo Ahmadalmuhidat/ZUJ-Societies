@@ -1,46 +1,46 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-// const memberSchema = new mongoose.Schema({
-//   ID: { type: String, default: uuidv4 },
-//   User: String,
-//   Role: {
-//     type: String,
-//     enum: ['admin', 'moderator', 'member'],
-//     default: 'member'
-//   },
-//   JoinedAt: { type: Date, default: Date.now }
-// });
+const memberSchema = new mongoose.Schema({
+  ID: { type: String, default: uuidv4 },
+  User: String,
+  Role: {
+    type: String,
+    enum: ['admin', 'moderator', 'member'],
+    default: 'member'
+  },
+  JoinedAt: { type: Date, default: Date.now }
+});
 
-// const inviteSchema = new mongoose.Schema({
-//   ID: { type: String, default: uuidv4 },
-//   Inviter: String,
-//   Invitee: String,
-//   Status: {
-//     type: String,
-//     enum: ['pending', 'accepted', 'declined'],
-//     default: 'pending'
-//   },
-//   CreatedAt: { type: Date, default: Date.now }
-// });
+const inviteSchema = new mongoose.Schema({
+  ID: { type: String, default: uuidv4 },
+  Inviter: String,
+  Invitee: String,
+  Status: {
+    type: String,
+    enum: ['pending', 'accepted', 'declined'],
+    default: 'pending'
+  },
+  CreatedAt: { type: Date, default: Date.now }
+});
 
-// const joinRequestSchema = new mongoose.Schema({
-//   ID: { type: String, default: uuidv4 },
-//   User: String,
-//   Status: {
-//     type: String,
-//     enum: ['pending', 'approved', 'rejected'],
-//     default: 'pending'
-//   },
-//   RequestedAt: { type: Date, default: Date.now }
-// });
+const joinRequestSchema = new mongoose.Schema({
+  ID: { type: String, default: uuidv4 },
+  User: String,
+  Status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  RequestedAt: { type: Date, default: Date.now }
+});
 
 const societySchema = new mongoose.Schema({
-  ID: { 
-    type: String, 
-    unique: true, 
+  ID: {
+    type: String,
+    unique: true,
     required: true,
-    default: function() { return uuidv4(); }
+    default: function () { return uuidv4(); }
   },
   Name: String,
   Description: String,
@@ -84,9 +84,9 @@ const societySchema = new mongoose.Schema({
     emailNotifications: { type: Boolean, default: true }
   },
 
-  // Members: { type: [memberSchema], default: [] },
-  // Invites: { type: [inviteSchema], default: [] },
-  // JoinRequests: { type: [joinRequestSchema], default: [] }
+  Members: { type: [memberSchema], default: [] },
+  Invites: { type: [inviteSchema], default: [] },
+  JoinRequests: { type: [joinRequestSchema], default: [] }
 });
 
 module.exports = mongoose.model('Society', societySchema);

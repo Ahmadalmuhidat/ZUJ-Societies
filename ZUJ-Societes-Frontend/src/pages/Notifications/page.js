@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNotifications } from '../../hooks/useNotifications';
 import AxiosClient from '../../config/axios';
 
@@ -11,6 +11,34 @@ export default function NotificationsPage() {
     markAsRead,
     markAllAsRead
   } = useNotifications();
+
+  useEffect(() => {
+    const fetchInvitationStatuses = async () => {
+      const invitations = notifications.filter(n => n.Type === 'invitation');
+      const statuses = {};
+
+      for (const notif of invitations) {
+        if (notif.Data?.inviteId) {
+          try {
+            const response = await AxiosClient.post('/societies/members/invites/check-status', {
+              invitation_id: notif.Data.inviteId
+            });
+            if (response.data?.status) {
+              statuses[notif.Data.inviteId] = response.data.status;
+            }
+          } catch (error) {
+            console.log('Could not fetch status for invitation:', notif.Data.inviteId);
+          }
+        }
+      }
+
+      setInvitationResponses(statuses);
+    };
+
+    if (notifications.length > 0) {
+      fetchInvitationStatuses();
+    }
+  }, [notifications]);
 
   const getNotificationIcon = (type) => {
     const icons = {
@@ -37,9 +65,42 @@ export default function NotificationsPage() {
       join_request: 'bg-orange-100 text-orange-600',
       join_approved: 'bg-green-100 text-green-600',
       join_rejected: 'bg-red-100 text-red-600',
-      new_event: 'bg-emerald-100 text-emerald-600'
+      new_event: 'bg-emerald-100 text-emerald-600',
+      invitation: 'bg-indigo-100 text-indigo-600'
     };
     return colors[type] || colors.post;
+  };
+
+  const getNotificationCardStyle = (type) => {
+    const styles = {
+      event: 'bg-green-50 border-green-200 hover:bg-green-100',
+      society: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
+      post: 'bg-purple-50 border-purple-200 hover:bg-purple-100',
+      comment: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
+      like: 'bg-red-50 border-red-200 hover:bg-red-100',
+      join_request: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
+      join_approved: 'bg-green-50 border-green-200 hover:bg-green-100',
+      join_rejected: 'bg-red-50 border-red-200 hover:bg-red-100',
+      new_event: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
+      invitation: 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100'
+    };
+    return styles[type] || 'bg-white border-gray-100 hover:bg-gray-50';
+  };
+
+  const getNotificationBorderAccent = (type) => {
+    const borders = {
+      event: 'border-l-green-500',
+      society: 'border-l-blue-500',
+      post: 'border-l-purple-500',
+      comment: 'border-l-yellow-500',
+      like: 'border-l-red-500',
+      join_request: 'border-l-orange-500',
+      join_approved: 'border-l-green-500',
+      join_rejected: 'border-l-red-500',
+      new_event: 'border-l-emerald-500',
+      invitation: 'border-l-indigo-500'
+    };
+    return borders[type] || 'border-l-blue-500';
   };
 
   const formatTime = (timeString) => {
@@ -156,13 +217,20 @@ export default function NotificationsPage() {
             notifications.map((notification) => (
               <div
                 key={notification.ID || notification.id}
-                className={`bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-lg ${!(notification.Read || notification.read) ? 'border-l-4 border-l-blue-500' : ''
+                className={`rounded-2xl shadow-card border-2 overflow-hidden transition-all duration-300 hover:shadow-xl ${getNotificationCardStyle(notification.Type || notification.type)
+                  } ${!(notification.Read || notification.read)
+                    ? `border-l-4 ${getNotificationBorderAccent(notification.Type || notification.type)}`
+                    : ''
                   }`}
               >
                 {notification.Type === 'invitation' ? (
                   <div className="p-6">
                     {(() => {
-                      const status = invitationResponses[notification.Data.inviteId];
+                      // Check both local state and notification data for status
+                      const localStatus = invitationResponses[notification.Data.inviteId];
+                      const dataStatus = notification.Data?.status;
+                      const status = localStatus || dataStatus;
+
                       return (
                         <div className="flex items-start space-x-4">
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${getNotificationColor(notification.type)}`}>
@@ -182,11 +250,11 @@ export default function NotificationsPage() {
                             </div>
                             <p className="text-gray-600 mt-2">{notification.Message || notification.message}</p>
                             <div className="mt-4 flex space-x-3">
-                              {status === "accepted" ? (
+                              {status === "accepted" || status === "accept" ? (
                                 <div className="px-4 py-2 bg-green-100 text-green-600 rounded-lg text-sm font-medium">
                                   Invitation Accepted ✓
                                 </div>
-                              ) : status === "rejected" ? (
+                              ) : status === "rejected" || status === "decline" ? (
                                 <div className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-medium">
                                   Invitation Rejected ✕
                                 </div>
@@ -215,7 +283,7 @@ export default function NotificationsPage() {
                   </div>
                 ) : (
                   <div
-                    className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="p-6 cursor-pointer transition-colors"
                     onClick={() => markAsRead(notification.ID || notification.id)}
                   >
                     <div className="flex items-start space-x-4">

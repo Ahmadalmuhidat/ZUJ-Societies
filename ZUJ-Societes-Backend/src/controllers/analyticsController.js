@@ -2,9 +2,6 @@ const User = require('../models/users');
 const Post = require('../models/posts');
 const Event = require('../models/events');
 const Society = require('../models/societies');
-const Comment = require('../models/comments');
-const Like = require('../models/likes');
-const SocietyMembers = require('../models/societyMembers');
 const jsonWebToken = require("../helpers/jsonWebToken");
 
 exports.getPlatformAnalytics = async (req, res) => {
@@ -13,15 +10,17 @@ exports.getPlatformAnalytics = async (req, res) => {
       totalUsers,
       totalSocieties,
       totalPosts,
-      totalEvents,
-      totalComments
+      totalEvents
     ] = await Promise.all([
       User.countDocuments(),
       Society.countDocuments(),
       Post.countDocuments(),
-      Event.countDocuments(),
-      Comment.countDocuments()
+      Event.countDocuments()
     ]);
+
+    // Count total comments from all posts
+    const posts = await Post.find({}).select('CommentsCount').lean();
+    const totalComments = posts.reduce((sum, post) => sum + (post.CommentsCount || 0), 0);
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -71,15 +70,8 @@ exports.getTrendingPosts = async (req, res) => {
     const posts = await Post.find({
       CreatedAt: { $gte: daysAgo }
     })
-      .sort({ Likes: -1, CommentsCount: -1 })
+      .sort({ LikesCount: -1, CommentsCount: -1 })
       .limit(limit);
-
-    const postIds = posts.map(post => post._id.toString());
-    const likes = await Like.find({ Post: { $in: postIds } }).lean();
-
-    const userLikes = new Set(
-      likes.filter(like => like.User.toString() === userId).map(like => like.Post.toString())
-    );
 
     const userIds = [...new Set(posts.map(post => post.User.toString()))];
     const societyIds = [...new Set(posts.map(post => post.Society.toString()))];
@@ -90,14 +82,14 @@ exports.getTrendingPosts = async (req, res) => {
       const postUser = users.find(user => user.ID === post.User);
       const postSociety = societies.find(society => society.ID === post.Society);
       const likeCount = post.LikesCount || 0;
-      const isLiked = userLikes.has(post._id.toString());
+      const isLiked = post.Likes?.some(like => like.User === userId) || false;
 
       return {
         ID: post.ID,
         Content: post.Content,
         Likes: likeCount,
         CommentsCount: post.CommentsCount || 0,
-        Comments: post.Comments || 0,
+        Comments: post.CommentsCount || 0,
         Image: post.Image,
         CreatedAt: post.CreatedAt,
         IsLiked: isLiked,
@@ -124,11 +116,10 @@ exports.getActivityFeed = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const activities = [];
 
-    const memberships = await SocietyMembers.find({
-      User: userId
-    }).select("Society -_id").lean();
-
-    const userSocieties = memberships.map(member => member.Society);
+    const allSocieties = await Society.find({}).select("ID Members").lean();
+    const userSocieties = allSocieties
+      .filter(s => s.Members?.some(m => m.User === userId))
+      .map(s => s.ID);
 
     const recentPosts = await Post.aggregate([
       {
