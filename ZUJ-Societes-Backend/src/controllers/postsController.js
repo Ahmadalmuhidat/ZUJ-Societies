@@ -89,7 +89,7 @@ exports.createPost = async (req, res) => {
     });
 
     await post.save();
-    res.status(201).json({ message: 'Post created successfully.', post });
+    res.status(201).json({ data: post });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error_message: 'Internal server error.' });

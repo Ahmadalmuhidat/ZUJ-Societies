@@ -1,4 +1,4 @@
-## ZUJ Societes Management Platform
+## Campusly Platform
 Is my graduation project built for Al-Zaytoonah University (ZUJ) to manage student societies, organize events, and foster community engagement.
 This platform includes a React-based frontend and a Node.js + MongoDB backend, offering a comprehensive system for both students and administrators.
 
@@ -10,10 +10,8 @@ A modern React-based frontend for managing university societies and events. It p
 ### Backend (Node.js)
 A secure and scalable Node.js API that handles all business logic, data storage, authentication, and event management using MongoDB, Express.js, and JWT authentication.
 
-
 ## Features
 
-### Core Features
 - User Authentication & Authorization – Secure login and registration system
 - Society Management – Create, join, and manage university societies
 - Event Management – Organize and participate in events
@@ -54,8 +52,8 @@ npm run build
 
 ### Docker Deployment
 ```
-docker build -t zuj-societies-frontend .
-docker run -p 80:80 zuj-societies-frontend
+docker build -t campusly-frontend .
+docker run -p 80:80 campusly-frontend
 ```
 
 ### Environment Variables
@@ -101,14 +99,14 @@ API available at: http://localhost:4000
 
 ### Docker Deployment
 ```
-docker build -t zuj-societies-backend .
-docker run -d --name zuj-societies-backend \
+docker build -t campusly-backend .
+docker run -d --name campusly-backend \
   -p 4000:4000 \
   -e SECRET=your_jwt_secret \
   -e MONGO_URI=your_mongodb_uri \
   -e EMAIL_USER=your_email \
   -e EMAIL_PASS=your_password \
-  zuj-societies-backend
+  campusly-backend
 ```
 
 ## Security Features
@@ -129,10 +127,10 @@ The included Jenkinsfile automates:
 - Environment variable setup
 
 ### Jenkins Credentials:
-- zuj-societies-jwt-secret
-- zuj-societies-mongo-uri
-- zuj-societies-email-user
-- zuj-societies-email-pass
+- campusly-jwt-secret
+- campusly-mongo-uri
+- campusly-email-user
+- campusly-email-pass
 
 ### Nginx Configuration
 The React app is served via Nginx, configured for optimal caching and routing for SPAs.

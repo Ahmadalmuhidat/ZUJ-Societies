@@ -11,7 +11,9 @@ export default function ChangeRole({
 }) {
 
   const handleRoleUpdate = async () => {
-    if (!selectedMember) return;
+    if (!selectedMember) {
+      return;
+    }
 
     try {
       const response = await AxiosClient.put("/societies/members/roles", {
@@ -20,7 +22,7 @@ export default function ChangeRole({
         society_id: society_id
       });
 
-      if (response.status === 200) {
+      if (response.status === 204) {
         getAllSocietyMembers();
         setShowModal(false);
       }

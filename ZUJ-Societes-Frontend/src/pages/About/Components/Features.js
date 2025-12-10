@@ -35,7 +35,7 @@ export default function Features() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-800 mb-2">Social Engagement</h3>
-            <p className="text-gray-600">Connect with fellow ZUJ students through posts, comments, likes, and real-time notifications. Build meaningful campus relationships.</p>
+            <p className="text-gray-600">Connect with fellow Campusly friends through posts, comments, likes, and real-time notifications. Build meaningful campus relationships.</p>
           </div>
         </div>
 

@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_IMAGE = "zuj-societies-backend"
-    DOCKER_CONTAINER = "zuj-societies-backend"
+    DOCKER_IMAGE = "campusly-backend"
+    DOCKER_CONTAINER = "campusly-backend"
   }
 
   stages {
@@ -38,10 +38,10 @@ pipeline {
       steps {
         echo "Running container ${DOCKER_CONTAINER}..."
         withCredentials([
-          string(credentialsId: 'zuj-societies-jwt-secret', variable: 'SECRET'),
-          string(credentialsId: 'zuj-societies-mongo-uri', variable: 'MONGO_URI'),
-          string(credentialsId: 'zuj-societies-email-user', variable: 'EMAIL_USER'),
-          string(credentialsId: 'zuj-societies-email-pass', variable: 'EMAIL_PASS')
+          string(credentialsId: 'campusly-jwt-secret', variable: 'SECRET'),
+          string(credentialsId: 'campusly-mongo-uri', variable: 'MONGO_URI'),
+          string(credentialsId: 'campusly-email-user', variable: 'EMAIL_USER'),
+          string(credentialsId: 'campusly-email-pass', variable: 'EMAIL_PASS')
         ]) {
           sh """
             docker run -d --name ${DOCKER_CONTAINER} \

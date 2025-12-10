@@ -1,21 +1,3 @@
-## Features
-
-### Core Functionality
-- **User Authentication & Authorization** - Secure login/registration system
-- **Society Management** - Create, join, and manage university societies
-- **Event Management** - Organize and participate in society events
-- **Member Management** - Handle society memberships and roles
-- **Real-time Notifications** - Stay updated with society activities
-- **Activity Feed** - Track recent activities across societies
-- **Personalized Recommendations** - Discover relevant societies and events
-
-### Key Pages
-- **Home Dashboard** - Personalized feed with quick actions
-- **Societies** - Browse and manage societies
-- **Events** - Discover and create events
-- **Account Management** - Profile and society management
-- **Support** - Help and FAQ sections
-
 ## Tech Stack
 
 - **Frontend Framework**: React 19.1.1
@@ -73,12 +55,12 @@
 
 1. **Build the Docker image**
    ```bash
-   docker build -t zuj-societies-frontend .
+   docker build -t campusly-frontend .
    ```
 
 2. **Run the container**
    ```bash
-   docker run -p 80:80 zuj-societies-frontend
+   docker run -p 80:80 campusly-frontend
    ```
 
 3. **Access the application**
@@ -93,25 +75,25 @@ docker-compose up -d
 
 ```
 src/
-├── components/           # Reusable UI components
-├── context/             # React Context providers
-│   ├── AuthContext.js   # Authentication state
-│   ├── MembershipContext.js # Society membership state
-│   └── NavigationContext.js # Navigation state
-├── pages/               # Page components
-│   ├── Home/           # Dashboard and main feed
-│   ├── Auth/           # Login and registration
-│   ├── Societies/      # Society management
-│   ├── Events/         # Event management
-│   ├── Account/        # User account management
-│   └── Support/        # Help and support
-├── shared/             # Shared components and utilities
-│   ├── components/     # Reusable UI components
-│   ├── layout/         # Layout components
-│   └── post/           # Post-related components
-├── utils/              # Utility functions
-└── config/             # Configuration files
-    └── axios.js        # HTTP client configuration
+├── components/               # Reusable UI components
+├── context/                  # React Context providers
+│   ├── AuthContext.js        # Authentication state
+│   ├── MembershipContext.js  # Society membership state
+│   └── NavigationContext.js  # Navigation state
+├── pages/                    # Page components
+│   ├── Home/                 # Dashboard and main feed
+│   ├── Auth/                 # Login and registration
+│   ├── Societies/            # Society management
+│   ├── Events/               # Event management
+│   ├── Account/              # User account management
+│   └── Support/              # Help and support
+├── shared/                   # Shared components and utilities
+│   ├── components/           # Reusable UI components
+│   ├── layout/               # Layout components
+│   └── post/                 # Post-related components
+├── utils/                    # Utility functions
+└── config/                   # Configuration files
+    └── axios.js              # HTTP client configuration
 ```
 
 ## Styling
@@ -157,15 +139,3 @@ The application is fully responsive and optimized for:
 
 ### Nginx Configuration
 The included `nginx.conf` provides optimized configuration for serving the React application.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.

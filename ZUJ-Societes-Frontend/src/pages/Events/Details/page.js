@@ -48,7 +48,6 @@ export default function EventDetailsPage() {
     }
   };
 
-  
   const getEventStats = async () => {
     try {
       setLoadingStats(true);
@@ -65,8 +64,6 @@ export default function EventDetailsPage() {
     }
   };
 
-
-  
   const getUserEventStatus = async () => {
     if (!isAuthenticated) return;
     
@@ -85,7 +82,6 @@ export default function EventDetailsPage() {
     }
   };
 
-  
   const toggleAttendance = async () => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -103,7 +99,6 @@ export default function EventDetailsPage() {
       if (response.status === 200) {
         setIsAttending(!isAttending);
         getEventStats(); 
-        toast.success(response.data.data.message);
       }
     } catch (error) {
       console.error("Failed to toggle attendance:", error);

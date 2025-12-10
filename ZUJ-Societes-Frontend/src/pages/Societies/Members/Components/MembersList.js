@@ -3,6 +3,7 @@ import AxiosClient from "../../../../config/axios";
 import ChangeRole from "../Modals/ChangeRole";
 import Search from "./Search";
 import { useAuth } from '../../../../context/AuthContext';
+import { useSocietyMembership } from '../../../../context/MembershipContext';
 import { Link } from 'react-router-dom';
 import { toast } from "react-toastify";
 
@@ -11,6 +12,8 @@ export default function MembersList({ id, members, setMembers }) {
   const [roleFilter, setRoleFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const { isAuthenticated } = useAuth();
+  const { isAdmin } = useSocietyMembership(id);
+
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newRole, setNewRole] = useState('');
@@ -129,27 +132,31 @@ export default function MembersList({ id, members, setMembers }) {
                       to={`/users/${member.ID}`}
                       className="inline-flex items-center px-3 py-1.5 border border-blue-200 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors text-sm font-medium"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 100 10A5 5 0 0010 2z"/><path fillRule="evenodd" d="M.458 17.042A9.956 9.956 0 0110 12c3.042 0 5.79 1.356 7.542 3.542A1 1 0 0116.8 17H3.2a1 1 0 01-.742-1.958z" clipRule="evenodd"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 100 10A5 5 0 0010 2z" /><path fillRule="evenodd" d="M.458 17.042A9.956 9.956 0 0110 12c3.042 0 5.79 1.356 7.542 3.542A1 1 0 0116.8 17H3.2a1 1 0 01-.742-1.958z" clipRule="evenodd" /></svg>
                       View Profile
                     </Link>
-                    {member.Role !== 'admin' && isAuthenticated && (
+                    {isAdmin && (
                       <>
-                        <button
-                          className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-50 transition-colors"
-                          onClick={() => {
-                            setSelectedMember(member);
-                            setNewRole(member.Role);
-                            setShowModal(true);
-                          }}
-                        >
-                          Change Role
-                        </button>
-                        <button
-                          onClick={() => removeMember(member.ID)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          Remove
-                        </button>
+                        {member.Role !== 'admin' && isAuthenticated && (
+                          <>
+                            <button
+                              className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-50 transition-colors"
+                              onClick={() => {
+                                setSelectedMember(member);
+                                setNewRole(member.Role);
+                                setShowModal(true);
+                              }}
+                            >
+                              Change Role
+                            </button>
+                            <button
+                              onClick={() => removeMember(member.ID)}
+                              className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </>
+                        )}
                       </>
                     )}
                   </div>

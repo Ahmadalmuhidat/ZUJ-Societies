@@ -164,10 +164,7 @@ exports.deleteEvent = async (req, res) => {
       return res.status(404).json({ error_message: "Event not found." });
     }
 
-    res.status(200).json({
-      message: "Event deleted successfully",
-      data: result
-    });
+    res.status(200).json({ data: result });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to delete event." });
@@ -264,12 +261,7 @@ exports.toggleEventAttendance = async (req, res) => {
       await attendance.save();
     }
 
-    res.status(200).json({
-      data: {
-        message: `Successfully ${status} event`,
-        status: attendance.Status
-      }
-    });
+    res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to update event attendance." });
@@ -293,7 +285,7 @@ exports.recordEventShare = async (req, res) => {
     });
     await shareRecord.save();
 
-    res.status(200).json({ data: { message: "Share recorded successfully." } });
+    res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to record share" });

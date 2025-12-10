@@ -174,7 +174,7 @@ export default function SocietySettings() {
         notifications: settings.notifications
       });
 
-      if (response.status !== 200) {
+      if (response.status !== 204) {
         throw new Error('Failed to save settings');
       }
     } catch (error) {
@@ -199,7 +199,7 @@ export default function SocietySettings() {
         society_id: id
       });
 
-      if (response.status === 200) {
+      if (response.status === 204) {
         toast.success(`You left the society`);
         navigate("/societies");
       }

@@ -2,12 +2,12 @@ export default [
   {
     id: 1,
     question: 'How do I join a society on Campusly?',
-    answer: 'To join a society, browse the Societies page, find a society you\'re interested in, and click the "Join Society" button. Your request will be sent to the society administrators for approval. You\'ll receive a notification once your request is processed. Make sure you\'re logged in with your ZUJ student account.'
+    answer: 'To join a society, browse the Societies page, find a society you\'re interested in, and click the "Join Society" button. Your request will be sent to the society administrators for approval. You\'ll receive a notification once your request is processed. Make sure you\'re logged in with Campusly account.'
   },
   {
     id: 2,
     question: 'How can I create my own society?',
-    answer: 'You can create a new society by going to the Societies page and clicking "Create Society". Fill out the required information including society name, description, category, and privacy settings. You\'ll automatically become the society administrator and can invite other ZUJ students to join.'
+    answer: 'You can create a new society by going to the Societies page and clicking "Create Society". Fill out the required information including society name, description, category, and privacy settings. You\'ll automatically become the society administrator and can invite others to join.'
   },
   {
     id: 3,
@@ -22,12 +22,12 @@ export default [
   {
     id: 5,
     question: 'How do I manage society members and roles?',
-    answer: 'As a society administrator, go to your society\'s Members page to view all members, change member roles (admin, moderator, member), approve join requests, and remove members if necessary. You can also send invitations to specific ZUJ students.'
+    answer: 'As a society administrator, go to your society\'s Members page to view all members, change member roles (admin, moderator, member), approve join requests, and remove members if necessary. You can also send invitations to other users.'
   },
   {
     id: 6,
     question: 'What are the different society privacy settings?',
-    answer: 'Societies can be set to Public (visible to all ZUJ students), Private (invite-only), or Invite-Only (requires approval). You can also control who can post, create events, and invite members through the society\'s permission settings.'
+    answer: 'Societies can be set to Public (visible to all users), Private (invite-only), or Invite-Only (requires approval). You can also control who can post, create events, and invite members through the society\'s permission settings.'
   },
   {
     id: 7,
@@ -47,6 +47,6 @@ export default [
   {
     id: 10,
     question: 'How do I get help with technical issues?',
-    answer: 'If you\'re experiencing technical problems, try refreshing the page or clearing your browser cache first. If the issue persists, contact our support team through the Support page or email support@zuj-societies.edu with details about the problem.'
+    answer: 'If you\'re experiencing technical problems, try refreshing the page or clearing your browser cache first. If the issue persists, contact our support team through the Support page or email support@campusly.edu with details about the problem.'
   }
 ];

@@ -21,7 +21,6 @@ export default function EventCard({ onEventDeleted, ...event }) {
     navigate(`/events/${event.ID}`);
   };
 
-  
   const canDelete = isAuthenticated && (
     event.User === user?.ID || 
     isAdmin 
@@ -30,7 +29,7 @@ export default function EventCard({ onEventDeleted, ...event }) {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      
+
       const response = await AxiosClient.delete("/events", {
         params: { 
           event_id: event.ID

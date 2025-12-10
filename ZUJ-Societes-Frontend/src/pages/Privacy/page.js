@@ -251,8 +251,8 @@ export default function PrivacyPage() {
                   If you have any questions about this Privacy Policy or our data practices, please contact us:
                 </p>
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <p className="text-gray-700 mb-2"><strong>Data Protection Officer:</strong> privacy@zuj-societies.edu</p>
-                  <p className="text-gray-700 mb-2"><strong>General Inquiries:</strong> support@zuj-societies.edu</p>
+                  <p className="text-gray-700 mb-2"><strong>Data Protection Officer:</strong> privacy@campusly.edu</p>
+                  <p className="text-gray-700 mb-2"><strong>General Inquiries:</strong> support@campusly.edu</p>
                   <p className="text-gray-700 mb-2"><strong>Phone:</strong> +962 6 535 5000</p>
                   <p className="text-gray-700 mb-2"><strong>Address:</strong> University of Jordan, Amman, Jordan</p>
                   <p className="text-gray-700"><strong>Office Hours:</strong> Sunday - Thursday, 8:00 AM - 4:00 PM (Jordan Time)</p>

@@ -64,7 +64,7 @@ exports.deleteComment = async (req, res) => {
     }
 
     const result = await Comment.deleteOne({ ID: comment_id });
-    res.status(200).json({ message: "Comment deleted successfully.", data: result });
+    res.status(200).json({ data: result });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to delete comment." });

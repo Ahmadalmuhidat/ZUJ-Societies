@@ -112,8 +112,8 @@ export default function QuickPostCreator({ onPostCreated }) {
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
       <div className="flex items-center space-x-3 mb-4">
-        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
@@ -126,7 +126,7 @@ export default function QuickPostCreator({ onPostCreated }) {
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
+          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary-500 hover:text-primary-600 transition-colors"
         >
           <div className="flex items-center justify-center space-x-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ export default function QuickPostCreator({ onPostCreated }) {
             <select
               value={selectedSociety}
               onChange={(e) => setSelectedSociety(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
             >
               {societies.map((society) => (
@@ -164,7 +164,7 @@ export default function QuickPostCreator({ onPostCreated }) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Share your thoughts with the community..."
-              className="w-full px-3 py-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
               rows={4}
               required
             />
@@ -179,7 +179,7 @@ export default function QuickPostCreator({ onPostCreated }) {
               value={image}
               onChange={(e) => setImage(e.target.value)}
               placeholder="https://example.com/image.jpg"
-              className="w-full px-3 py-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             {handleImagePreview()}
           </div>
@@ -199,7 +199,7 @@ export default function QuickPostCreator({ onPostCreated }) {
             <button
               type="submit"
               disabled={loading || !content.trim()}
-              className="px-6 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-2 bg-primary-600 text-white text-sm rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Posting...' : 'Post'}
             </button>

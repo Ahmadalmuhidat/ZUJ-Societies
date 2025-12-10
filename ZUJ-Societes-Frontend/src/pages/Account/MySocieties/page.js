@@ -17,10 +17,7 @@ export default function MySocieties() {
       const response = await AxiosClient.get("/user/societies");
 
       if (response.status === 200) {
-        const unique = Array.from(
-          new Map(response.data.data.map(s => [s.ID, s])).values()
-        );
-
+        const unique = Array.from(new Map(response.data.data.map(s => [s.ID, s])).values());
         setSocieties(unique);
       }
     } catch (error) {

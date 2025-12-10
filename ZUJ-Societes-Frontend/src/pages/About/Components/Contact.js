@@ -31,7 +31,7 @@ export default function Contact() {
           Contact Support
         </a>
         <a
-          href="mailto:support@zuj-societies.edu"
+          href="mailto:support@campusly.edu"
           className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors text-center"
         >
           Email Support

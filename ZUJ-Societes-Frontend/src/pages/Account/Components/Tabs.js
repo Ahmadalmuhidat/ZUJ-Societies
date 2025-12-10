@@ -54,7 +54,7 @@ export default function Tabs({ profileData, setProfileData }) {
         privacy
       });
 
-      if (response.status === 200) {
+      if (response.status === 204) {
         setIsEditing(false);
         toast.success(`Profile updated successfully`);
       }
@@ -83,7 +83,7 @@ export default function Tabs({ profileData, setProfileData }) {
         privacy
       });
 
-      if (response.status !== 200) {
+      if (response.status !== 204) {
         throw new Error('Failed to save settings');
       }
     } catch (error) {

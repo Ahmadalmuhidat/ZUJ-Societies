@@ -1,14 +1,3 @@
-A comprehensive Node.js backend API for managing university societies, events, posts, and user interactions at Zarqa University (ZUJ).
-
-## Features
-
-- **User Management**: Registration, authentication, profile management
-- **Society Management**: Create, join, and manage university societies
-- **Event System**: Create, manage, and track event attendance
-- **Social Features**: Posts, comments, likes, and interactions
-- **Analytics**: Platform analytics and user recommendations
-- **Support System**: Ticket-based support system
-
 ## Tech Stack
 
 - **Runtime**: Node.js 18
@@ -59,18 +48,18 @@ A comprehensive Node.js backend API for managing university societies, events, p
 
 1. **Build the Docker image**
    ```bash
-   docker build -t zuj-societies-backend .
+   docker build -t campusly-backend .
    ```
 
 2. **Run the container**
    ```bash
-   docker run -d --name zuj-societies-backend \
+   docker run -d --name campusly-backend \
      -p 4000:4000 \
      -e SECRET=your_jwt_secret \
      -e MONGO_URI=your_mongodb_uri \
      -e EMAIL_USER=your_email \
      -e EMAIL_PASS=your_password \
-     zuj-societies-backend
+     campusly-backend
    ```
 
 ## Project Structure
@@ -78,33 +67,33 @@ A comprehensive Node.js backend API for managing university societies, events, p
 ```
 src/
 ├── config/
-│   └── database.js          # Database configuration
+│   └── database.js                   # Database configuration
 ├── controllers/
-│   ├── analytics.js         # Analytics controller
-│   ├── auth.js             # Authentication controller
-│   ├── comments.js         # Comments controller
-│   ├── events.js           # Events controller
-│   ├── posts.js            # Posts controller
-│   ├── societies.js        # Societies controller
-│   ├── support.js          # Support controller
-│   └── user.js             # User controller
+│   ├── analyticsController.js        # Analytics controller
+│   ├── authController.js             # Authentication controller
+│   ├── commentsController.js         # Comments controller
+│   ├── eventsController.js           # Events controller
+│   ├── postsController.js            # Posts controller
+│   ├── societiesController.js        # Societies controller
+│   ├── supportController.js          # Support controller
+│   └── userController.js             # User controller
 ├── helper/
-│   ├── jsonWebToken.js   # JWT helper functions
-│   ├── passwords.js        # Password utilities
+│   ├── jsonWebToken.js               # JWT helper functions
+│   ├── passwords.js                  # Password utilities
 ├── middlewares/
-│   └── auth.js             # Authentication middleware
+│   └── authMiddleware.js             # Authentication middleware
 ├── models/
-│   ├── comments.js         # Comments model
-│   ├── events.js           # Events model
-│   ├── posts.js            # Posts model
-│   ├── societies.js        # Societies model
-│   ├── users.js            # Users model
-│   └── ...                 # Other models
+│   ├── comments.js                   # Comments model
+│   ├── events.js                     # Events model
+│   ├── posts.js                      # Posts model
+│   ├── societies.js                  # Societies model
+│   ├── users.js                      # Users model
+│   └── ...                           # Other models
 ├── routes/
-│   └── routes.js           # API routes
+│   └── routes.js                     # API routes
 ├── services/
-│   └── mailer.js           # Email service
-└── server.js               # Main server file
+│   └── mailer.js                     # Email service
+└── server.js                         # Main server file
 ```
 
 ## Security Features
@@ -123,10 +112,10 @@ src/
 The project includes a Jenkinsfile for automated deployment:
 
 1. **Credentials Setup**: Configure the following credentials in Jenkins:
-   - `zuj-societies-jwt-secret`
-   - `zuj-societies-mongo-uri`
-   - `zuj-societies-email-user`
-   - `zuj-societies-email-pass`
+   - `campusly-jwt-secret`
+   - `campusly-mongo-uri`
+   - `campusly-email-user`
+   - `campusly-email-pass`
 
 2. **Pipeline**: The Jenkins pipeline will:
    - Checkout code
@@ -143,20 +132,3 @@ The project includes a Jenkinsfile for automated deployment:
 | `MONGO_URI` | MongoDB connection string | Yes |
 | `EMAIL_USER` | Email service username | Yes |
 | `EMAIL_PASS` | Email service password | Yes |
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-
-**Ahmad ALmuhidat**
-- Email: ahmad.almuhidat@gmail.com

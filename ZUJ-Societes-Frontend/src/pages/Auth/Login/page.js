@@ -58,14 +58,14 @@ export default function Login() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 relative overflow-hidden ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-primary-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 relative overflow-hidden ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
       {/* Modern geometric background pattern */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/40 via-transparent to-cyan-50/40"></div>
-        <div className="absolute top-10 left-10 w-64 h-64 bg-indigo-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-50/40 via-transparent to-cyan-50/40"></div>
+        <div className="absolute top-10 left-10 w-64 h-64 bg-primary-200/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-20 right-20 w-48 h-48 bg-cyan-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
         <div className="absolute bottom-20 left-1/4 w-56 h-56 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '3s'}}></div>
-        <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-blue-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '4.5s'}}></div>
+        <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-primary-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '4.5s'}}></div>
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.15) 1px, transparent 0)`,
@@ -76,7 +76,7 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-primary-600 to-primary-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
@@ -109,7 +109,7 @@ export default function Login() {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'
                     } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
@@ -141,7 +141,7 @@ export default function Login() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'
                     } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
@@ -162,13 +162,13 @@ export default function Login() {
                     type="checkbox"
                     checked={formData.rememberMe}
                     onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded transition-colors"
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                     Remember me
                   </label>
                 </div>
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors">
+                <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-500 font-medium transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -194,7 +194,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isLoading ? (
                     <>
@@ -232,7 +232,7 @@ export default function Login() {
             <div className="mt-6 text-center">
               <Link
                 to="/signup"
-                className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -247,11 +247,11 @@ export default function Login() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-500">
             By signing in, you agree to our{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-500 font-medium">
+            <Link to="/terms" className="text-primary-600 hover:text-primary-500 font-medium">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-500 font-medium">
+            <Link to="/privacy" className="text-primary-600 hover:text-primary-500 font-medium">
               Privacy Policy
             </Link>
           </p>

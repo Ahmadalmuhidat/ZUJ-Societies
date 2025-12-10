@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_IMAGE = "zuj-societies-frontend"
-    DOCKER_CONTAINER = "zuj-societies-frontend"
+    DOCKER_IMAGE = "campusly-frontend"
+    DOCKER_CONTAINER = "campusly-frontend"
   }
 
   stages {

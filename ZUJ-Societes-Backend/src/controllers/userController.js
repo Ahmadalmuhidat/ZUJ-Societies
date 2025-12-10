@@ -98,7 +98,7 @@ exports.updateProfile = async (req, res) => {
 
     if (!result) return res.status(404).json({ error_message: "User not found." });
 
-    res.status(200).json({ data: result });
+    res.status(204).json({ data: result });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to update User profile." });

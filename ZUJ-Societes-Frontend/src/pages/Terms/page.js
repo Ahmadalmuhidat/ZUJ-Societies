@@ -26,7 +26,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Welcome to Campusly, the official student society management platform of the Al-Zaytoonah University of Jordan (ZUJ). 
+                  Welcome to Campusly, the official student society management platform of the Universities in Jordan. 
                   These Terms of Service ("Terms") govern your use of our platform and services. By accessing or using Campusly, 
                   you agree to be bound by these Terms.
                 </p>
@@ -182,7 +182,7 @@ export default function TermsPage() {
                   If you have any questions about these Terms, please contact us:
                 </p>
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <p className="text-gray-700 mb-2"><strong>Email:</strong> legal@zuj-societies.edu</p>
+                  <p className="text-gray-700 mb-2"><strong>Email:</strong> legal@campusly.edu</p>
                   <p className="text-gray-700 mb-2"><strong>Phone:</strong> +962 6 535 5000</p>
                   <p className="text-gray-700 mb-2"><strong>Address:</strong> University of Jordan, Amman, Jordan</p>
                   <p className="text-gray-700"><strong>Office Hours:</strong> Sunday - Thursday, 8:00 AM - 4:00 PM (Jordan Time)</p>

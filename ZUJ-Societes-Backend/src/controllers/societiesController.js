@@ -113,7 +113,7 @@ exports.inviteMemberToSociety = async (req, res) => {
     };
 
     ServerSentEvents.sendToUser([InviteeID], notification);
-    res.status(201).json({ message: 'Invitation sent successfully.', invite });
+    res.status(201).json({ data: invite });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error_message: 'Failed to send invitation.' });
@@ -143,11 +143,11 @@ exports.respondToInvitation = async (req, res) => {
       await newMember.save();
       invitation.Status = 'accepted';
       await invitation.save();
-      res.status(200).json({ message: 'Invitation accepted successfully.' });
+      res.status(200).json({ data: invitation });
     } else if (response === 'decline') {
       invitation.Status = 'declined';
       await invitation.save();
-      res.status(200).json({ message: 'Invitation declined successfully.' });
+      res.status(200).json({ data: invitation });
     } else {
       res.status(400).json({ error_message: 'Invalid response. Must be "accept" or "decline".' });
     }
@@ -215,7 +215,7 @@ exports.cancelInvitation = async (req, res) => {
       type: 'invitation',
       Data: { inviteId: invitation.ID }
     });
-    res.status(200).json({ message: 'Invitation cancelled successfully.' });
+    res.status(200).json({ data: invitation });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error_message: 'Failed to cancel invitation.' });
@@ -333,7 +333,7 @@ exports.deleteSociety = async (req, res) => {
       return res.status(404).json({ error_message: "Society not found." });
     }
 
-    res.status(200).json({ message: "Society deleted successfully." });
+    res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to delete society." });
@@ -604,7 +604,28 @@ exports.getAllMembers = async (req, res) => {
 exports.removeMember = async (req, res) => {
   try {
     const { society_id, user_id } = req.query;
-    const result = await SocietyMember.deleteOne({ Society: society_id, User: user_id });
+    const token = req.headers['authorization']?.split(' ')[1];
+    const userId = JsonWebToken.verifyToken(token)['id'];
+    const isAdmin = await SocietyMember.exists({
+      User: userId,
+      Society: society_id,
+      Role: 'admin'
+    });
+
+    if (!isAdmin) {
+      return res.status(403).json({ error_message: "You don't have permission to remove the member." });
+    }
+
+    const isOwner = await Society.findOne({ ID: society_id });
+    if (isOwner && isOwner.User === user_id) {
+      return res.status(400).json({ error_message: "You cannot remove the owner of the society." });
+    }
+
+    const result = await SocietyMember.deleteOne({
+      Society: society_id,
+      User: user_id
+    });
+
     res.status(204).json({ data: result });
   } catch (err) {
     console.error(err);
@@ -713,17 +734,21 @@ exports.leaveSociety = async (req, res) => {
       return res.status(400).json({ error_message: "Society ID is required." });
     }
 
-    const membership = await SocietyMember.findOne({ User: userID, Society: society_id });
-    if (!membership) {
+    const isMember = await SocietyMember.findOne({ User: userID, Society: society_id });
+    if (!isMember) {
       return res.status(404).json({ error_message: "You are not a member of this society." });
     }
 
-    const society = await Society.findOne({ ID: society_id });
-    if (society && society.User === userID) {
+    const isOwner = await Society.findOne({ ID: society_id });
+    if (isOwner && isOwner.User === userID) {
       return res.status(400).json({ error_message: "Society creators cannot leave. Please transfer ownership or delete the society instead." });
     }
 
-    const result = await SocietyMember.deleteOne({ User: userID, Society: society_id });
+    const result = await SocietyMember.deleteOne({
+      User: userID,
+      Society: society_id
+    });
+
     if (result.deletedCount === 0) {
       return res.status(404).json({ error_message: "Membership not found." });
     }
