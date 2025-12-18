@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SocietyNav from './SocietyNav';
 import { useAuth } from '../../../context/AuthContext';
 import AxiosClient from '../../../config/axios';
 import { useSocietyMembership } from '../../../context/MembershipContext';
+import TransferOwnershipModal from '../../../shared/components/TransferOwnershipModal';
+import { toast } from 'react-toastify';
 
 const societyDetailsCache = new Map();
 const joinStatusCache = new Map();
@@ -15,7 +17,9 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
   const { isAuthenticated } = useAuth();
   const [joinRequested, setJoinRequested] = useState(Boolean(cacheJoin));
   const [mounted, setMounted] = useState(Boolean(cacheDetails));
-  const [dropdownOpen, setDropdownOpen] = useState(false); // new
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const { user } = useAuth();
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -69,6 +73,12 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
 
   const handleLeaveSociety = async () => {
     if (!isAuthenticated) return;
+
+    if (details?.User === user?.ID) {
+      setShowTransferModal(true);
+      return;
+    }
+
     try {
       const response = await AxiosClient.post("/societies/leave", { society_id: societyId });
       if (response.status === 200) {
@@ -77,6 +87,7 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
       }
     } catch (error) {
       console.error('Failed to leave society:', error);
+      toast.error(error.response?.data?.error_message || "Failed to leave society.");
     }
   };
 
@@ -224,6 +235,19 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
           <SocietyNav societyId={societyId} />
         </div>
       </div>
+
+      <TransferOwnershipModal
+        isOpen={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        societyId={societyId}
+        onTransferSuccess={() => {
+          getSocietyDetails(); // Refresh details to show new owner
+          setShowTransferModal(false);
+          // Optional: automatically leave after transfer? Or ask user to click leave again?
+          // For now, let's just refresh. The user can click leave again and it will work immediately since they aren't owner anymore.
+          toast.info("Ownership transferred. You can now leave the society.");
+        }}
+      />
     </>
   );
 }

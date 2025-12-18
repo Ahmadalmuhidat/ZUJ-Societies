@@ -1,6 +1,8 @@
 import React from 'react';
 
-export default function DangerZone({ leaveSociety, setShowDeleteConfirm }) {
+export default function DangerZone({ leaveSociety, setShowDeleteConfirm, isOwner }) {
+  if (!isOwner) return null; // Safety check
+
   return (
     <div>
       <h3 className="text-lg font-semibold text-red-600 mb-6">Danger Zone</h3>

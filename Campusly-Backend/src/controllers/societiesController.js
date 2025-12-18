@@ -3,6 +3,7 @@ const Notifications = require("../models/notifications");
 const Post = require("../models/posts");
 const Event = require("../models/events");
 const User = require("../models/users");
+const Report = require("../models/reports");
 const JsonWebToken = require("../helpers/jsonWebToken");
 const ServerSentEvents = require('../helpers/serverSentEvents');
 
@@ -14,7 +15,7 @@ exports.getSocietyInformation = async (req, res) => {
       {
         ID: society_id
       },
-      'Name Description Image Category Privacy Permissions Notifications Members'
+      'Name Description Image Category Privacy Permissions Notifications Members User'
     );
 
     if (!society) {
@@ -372,13 +373,38 @@ exports.deleteSociety = async (req, res) => {
       return res.status(403).json({ error_message: "You don't have permission to delete this society." });
     }
 
-    const result = await Society.deleteOne({ ID: society_id });
+    // CASCADE DELETE
+    // 1. Get all post and event IDs to clean up reports
+    const [posts, events] = await Promise.all([
+      Post.find({ Society: society_id }).select('ID'),
+      Event.find({ Society: society_id }).select('ID')
+    ]);
 
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ error_message: "Society not found." });
-    }
+    const postIds = posts.map(p => p.ID);
+    const eventIds = events.map(e => e.ID);
+    const allReferenceIds = [...postIds, ...eventIds];
 
-    res.status(200).json({ data: true });
+    // 2. Perform deletions in parallel
+    await Promise.all([
+      // Delete Posts
+      Post.deleteMany({ Society: society_id }),
+      // Delete Events
+      Event.deleteMany({ Society: society_id }),
+      // Delete Notifications related to this society, its posts, or its events
+      Notifications.deleteMany({
+        $or: [
+          { "Data.societyId": society_id },
+          { "Data.postId": { $in: postIds } },
+          { "Data.eventId": { $in: eventIds } }
+        ]
+      }),
+      // Delete Reports related to this society's content
+      Report.deleteMany({ ReferenceID: { $in: allReferenceIds } }),
+      // Delete the Society itself
+      Society.deleteOne({ ID: society_id })
+    ]);
+
+    res.status(200).json({ status: "success", message: "Society and all related data deleted successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to delete society." });
@@ -670,7 +696,8 @@ exports.getAllMembers = async (req, res) => {
         Name: user?.Name,
         Email: user?.Email,
         Photo: user?.Photo,
-        Role: member.Role
+        Role: member.Role,
+        isOwner: society.User === member.User
       };
     });
     res.status(200).json({ data });
@@ -691,10 +718,18 @@ exports.removeMember = async (req, res) => {
       return res.status(404).json({ error_message: "Society not found." });
     }
 
+    const isOwner = society.User === userId;
     const isAdmin = society.Members?.some(m => m.User === userId && m.Role === 'admin');
 
-    if (!isAdmin) {
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ error_message: "You don't have permission to remove the member." });
+    }
+
+    if (!isOwner) {
+      const targetMember = society.Members.find(m => m.User === user_id);
+      if (targetMember?.Role === 'admin') {
+        return res.status(403).json({ error_message: "Admins cannot remove other admins." });
+      }
     }
 
     if (society.User === user_id) {
@@ -786,24 +821,111 @@ exports.updateMemberRole = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
 
-    const isAdmin = await SocietyMember.exists({
-      User: userId,
-      Society: society_id,
-      Role: 'admin'
-    });
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
 
-    if (!isAdmin) {
+    const isOwner = society.User === userId;
+    const requestorMember = society.Members.find(m => m.User === userId);
+    const isAdmin = requestorMember?.Role === 'admin';
+
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ error_message: "You don't have permission to update member roles." });
     }
 
-    const result = await SocietyMember.updateOne(
-      { User: member, Society: society_id },
-      { Role: role }
+    // If not owner, check permissions
+    if (!isOwner) {
+      // Admins cannot change the owner's role (though owner isn't technically in Members with 'owner' role usually, but let's be safe)
+      if (member === society.User) {
+        return res.status(403).json({ error_message: "You cannot change the owner's role." });
+      }
+
+      // Admins cannot demote other admins? Or maybe they can? 
+      // User said: "if user is owner he change the rile for anyone, other that it dpend on his role"
+      // Let's assume admins can manage moderators and members.
+      const targetMember = society.Members.find(m => m.User === member);
+      if (targetMember?.Role === 'admin') {
+        return res.status(403).json({ error_message: "Admins cannot change other admins' roles." });
+      }
+    }
+
+    const result = await Society.updateOne(
+      { ID: society_id, "Members.User": member },
+      { $set: { "Members.$.Role": role } }
     );
-    res.status(204).json({ data: result });
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error_message: "Member not found in this society." });
+    }
+
+    res.status(204).json({ message: "Member role updated successfully." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to update member role." });
+  }
+};
+
+exports.transferOwnership = async (req, res) => {
+  try {
+    const { society_id, new_owner_id } = req.body;
+    const token = req.headers['authorization']?.split(' ')[1];
+    const currentOwnerId = JsonWebToken.verifyToken(token)['id'];
+
+    if (!society_id || !new_owner_id) {
+      return res.status(400).json({ error_message: "Society ID and New Owner ID are required." });
+    }
+
+    const society = await Society.findOne({ ID: society_id });
+    if (!society) {
+      return res.status(404).json({ error_message: "Society not found." });
+    }
+
+    if (society.User !== currentOwnerId) {
+      return res.status(403).json({ error_message: "Only the owner can transfer ownership." });
+    }
+
+    const newOwnerMember = society.Members.find(m => m.User === new_owner_id);
+    if (!newOwnerMember) {
+      return res.status(400).json({ error_message: "New owner must be a member of the society." });
+    }
+
+    // Update Society Owner
+    await Society.updateOne(
+      { ID: society_id },
+      { $set: { User: new_owner_id } }
+    );
+
+    // Update Roles: ensuring new owner is admin, old owner remains admin (or whatever they were, usually admin)
+    // Actually, let's explicitly set new owner to 'admin' if they aren't already.
+    if (newOwnerMember.Role !== 'admin') {
+      await Society.updateOne(
+        { ID: society_id, "Members.User": new_owner_id },
+        { $set: { "Members.$.Role": 'admin' } }
+      );
+    }
+
+    // Helper to send notification
+    try {
+      const notification = {
+        type: 'ownership_transferred',
+        title: 'Society Ownership Transferred',
+        message: `You are now the owner of ${society.Name}`,
+        data: {
+          societyId: society_id,
+          societyName: society.Name
+        },
+        time: new Date().toISOString()
+      };
+      await ServerSentEvents.sendToUser([new_owner_id], notification);
+    } catch (e) {
+      console.error("Failed to send notification", e);
+    }
+
+    res.status(200).json({ message: "Ownership transferred successfully." });
+  } catch (err) {
+    console.error("Failed to transfer ownership:", err);
+    res.status(500).json({ error_message: "Failed to transfer ownership." });
   }
 };
 

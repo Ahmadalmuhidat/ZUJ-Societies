@@ -1,5 +1,5 @@
-import React from "react";
 import AxiosClient from "../../../../config/axios";
+import { toast } from "react-toastify";
 
 export default function ChangeRole({
   selectedMember,
@@ -25,6 +25,7 @@ export default function ChangeRole({
       if (response.status === 204) {
         getAllSocietyMembers();
         setShowModal(false);
+        toast.success("Member role updated successfully.");
       }
     } catch (error) {
       console.error("Error updating role:", error);

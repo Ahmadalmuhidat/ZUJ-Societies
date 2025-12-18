@@ -44,6 +44,7 @@ router.get('/societies/members/check', authMiddleware.checkUserLoggedIn, societi
 router.get('/societies/admin/check', authMiddleware.checkUserLoggedIn, societiesController.checkAdmin);
 router.put('/societies', authMiddleware.checkUserLoggedIn, societiesController.updateInformation);
 router.put('/societies/members/roles', authMiddleware.checkUserLoggedIn, societiesController.updateMemberRole);
+router.post('/societies/ownership', authMiddleware.checkUserLoggedIn, societiesController.transferOwnership);
 router.post('/societies/leave', authMiddleware.checkUserLoggedIn, societiesController.leaveSociety);
 router.post('/societies/members/invites', authMiddleware.checkUserLoggedIn, societiesController.inviteMemberToSociety);
 router.post('/societies/members/invites/respond', authMiddleware.checkUserLoggedIn, societiesController.respondToInvitation);

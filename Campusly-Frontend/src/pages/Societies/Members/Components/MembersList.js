@@ -12,7 +12,7 @@ export default function MembersList({ id, members, setMembers }) {
   const [roleFilter, setRoleFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const { isAuthenticated } = useAuth();
-  const { isAdmin } = useSocietyMembership(id);
+  const { isAdmin, isOwner } = useSocietyMembership(id);
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -64,7 +64,8 @@ export default function MembersList({ id, members, setMembers }) {
     }
   };
 
-  const getRoleBadgeColor = (role) => {
+  const getRoleBadgeColor = (role, isOwner) => {
+    if (isOwner) return 'bg-amber-100 text-amber-800 ring-1 ring-amber-200';
     switch (role) {
       case 'admin':
         return 'bg-red-100 text-red-800';
@@ -123,8 +124,8 @@ export default function MembersList({ id, members, setMembers }) {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold capitalize ${getRoleBadgeColor(member.Role)}`}>
-                    {member.Role}
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold capitalize ${getRoleBadgeColor(member.Role, member.isOwner)}`}>
+                    {member.isOwner ? 'Owner' : member.Role}
                   </span>
 
                   <div className="flex space-x-2">
@@ -135,9 +136,13 @@ export default function MembersList({ id, members, setMembers }) {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 100 10A5 5 0 0010 2z" /><path fillRule="evenodd" d="M.458 17.042A9.956 9.956 0 0110 12c3.042 0 5.79 1.356 7.542 3.542A1 1 0 0116.8 17H3.2a1 1 0 01-.742-1.958z" clipRule="evenodd" /></svg>
                       View Profile
                     </Link>
-                    {isAdmin && (
+                    {(isOwner || isAdmin) && (
                       <>
-                        {member.Role !== 'admin' && isAuthenticated && (
+                        {/* 
+                          1. Owners can manage anyone except themselves.
+                          2. Admins can manage anyone except other admins (and the owner, implicitly).
+                        */}
+                        {((isOwner && !member.isOwner) || (isAdmin && member.Role !== 'admin' && !member.isOwner)) && isAuthenticated && (
                           <>
                             <button
                               className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded-lg hover:bg-green-50 transition-colors"

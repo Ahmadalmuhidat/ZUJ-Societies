@@ -10,6 +10,7 @@ export function MembershipProvider({ children }) {
 
   const fetchMembership = async (societyId) => {
     if (!isAuthenticated || !user) return;
+    if (!societyId) return;
 
     if (memberships[societyId]) return;
 
@@ -23,6 +24,7 @@ export function MembershipProvider({ children }) {
       const society = societyRes.data.data;
       const isMember = memberRes.data.data ?? false;
       const isAdmin = adminRes.data.data ?? false;
+      const isOwner = society?.User === user?.ID;
 
       let userRole = null;
       let isModerator = false;
@@ -37,6 +39,7 @@ export function MembershipProvider({ children }) {
         [societyId]: {
           isMember,
           isAdmin,
+          isOwner,
           isModerator,
           userRole,
           permissions: society?.Permissions || {
@@ -59,6 +62,7 @@ export function MembershipProvider({ children }) {
         [societyId]: {
           isMember: false,
           isAdmin: false,
+          isOwner: false,
           isModerator: false,
           userRole: null,
           permissions: {
@@ -83,7 +87,7 @@ export function MembershipProvider({ children }) {
       await AxiosClient.post('/societies/leave', { society_id: societyId });
       setMemberships((prev) => ({
         ...prev,
-        [societyId]: { isMember: false, isAdmin: false, isModerator: false, userRole: null },
+        [societyId]: { isMember: false, isAdmin: false, isOwner: false, isModerator: false, userRole: null },
       }));
     } catch (error) {
       console.error('Error leaving society:', error);
@@ -102,6 +106,7 @@ export const useSocietyMembership = (societyId) => {
   const membership = memberships[societyId] || {
     isMember: false,
     isAdmin: false,
+    isOwner: false,
     isModerator: false,
     userRole: null,
     permissions: {

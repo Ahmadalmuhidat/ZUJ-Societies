@@ -9,9 +9,11 @@ import Permissions from './Components/Permissions';
 import Notifications from './Components/Notifications';
 import DangerZone from './Components/DangerZone';
 import { useAutoSave } from '../../../hooks/useAutoSave';
+import { useSocietyMembership } from '../../../context/MembershipContext';
 
 export default function SocietySettings() {
   const { id } = useParams();
+  const { isOwner } = useSocietyMembership(id);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('general');
   const [settings, setSettings] = useState({
@@ -214,7 +216,7 @@ export default function SocietySettings() {
     { id: 'privacy', label: 'Privacy', icon: '🔒' },
     { id: 'permissions', label: 'Permissions', icon: '👥' },
     { id: 'notifications', label: 'Notifications', icon: '🔔' },
-    { id: 'danger', label: 'Danger Zone', icon: '⚠️' }
+    ...(isOwner ? [{ id: 'danger', label: 'Danger Zone', icon: '⚠️' }] : [])
   ];
 
   useEffect(() => {
@@ -266,7 +268,7 @@ export default function SocietySettings() {
                 {activeTab === 'privacy' && <Privacy settings={settings} handlePrivacyChange={handlePrivacyChange} />}
                 {activeTab === 'permissions' && <Permissions settings={settings} handlePermissionChange={handlePermissionChange} />}
                 {activeTab === 'notifications' && <Notifications settings={settings} handleNotificationChange={handleNotificationChange} />}
-                {activeTab === 'danger' && <DangerZone leaveSociety={leaveSociety} setShowDeleteConfirm={setShowDeleteConfirm} />}
+                {activeTab === 'danger' && <DangerZone leaveSociety={leaveSociety} setShowDeleteConfirm={setShowDeleteConfirm} isOwner={isOwner} />}
 
                 {activeTab === 'general' && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
