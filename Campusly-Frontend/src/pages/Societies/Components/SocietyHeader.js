@@ -29,7 +29,9 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
   const getSocietyDetails = async () => {
     try {
       const response = await AxiosClient.get('/societies/info', {
-        params: { society_id: societyId },
+        params: {
+          society_id: societyId
+        },
       });
       if (response.status === 200) {
         societyDetailsCache.set(societyId, response.data.data);
@@ -55,7 +57,9 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
   };
 
   const handleJoinSociety = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      return;
+    }
     try {
       const response = await AxiosClient.post("/societies/requests", { society_id: societyId });
       if (response.status === 201) {
@@ -72,7 +76,9 @@ export default function SocietyHeader({ societyId, showJoinButton = false, actio
   };
 
   const handleLeaveSociety = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      return;
+    }
 
     if (details?.User === user?.ID) {
       setShowTransferModal(true);

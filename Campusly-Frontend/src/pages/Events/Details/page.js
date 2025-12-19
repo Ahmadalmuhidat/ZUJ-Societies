@@ -11,7 +11,6 @@ export default function EventDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-
   const [event, setEvent] = useState(null);
   const { isAdmin } = useSocietyMembership(event?.Society);
   const [loading, setLoading] = useState(true);
@@ -66,7 +65,7 @@ export default function EventDetailsPage() {
 
   const getUserEventStatus = async () => {
     if (!isAuthenticated) return;
-    
+
     try {
       const response = await AxiosClient.get("/users/events/status", {
         params: {
@@ -90,15 +89,15 @@ export default function EventDetailsPage() {
 
     try {
       const newStatus = isAttending ? 'not_attending' : 'attending';
-      
+
       const response = await AxiosClient.post("/events/attendance", {
         event_id: id,
         status: newStatus
       });
-      
+
       if (response.status === 200) {
         setIsAttending(!isAttending);
-        getEventStats(); 
+        getEventStats();
       }
     } catch (error) {
       console.error("Failed to toggle attendance:", error);
@@ -112,12 +111,12 @@ export default function EventDetailsPage() {
       await AxiosClient.post("/events/share", {
         event_id: id,
       });
-      getEventStats(); 
+      getEventStats();
     } catch (error) {
       console.error("Failed to record share:", error);
     }
   };
-  
+
   const canDelete = useMemo(() => {
     if (!isAuthenticated || !event || !user) return false;
     return event.User === user.ID || isAdmin;
@@ -126,9 +125,9 @@ export default function EventDetailsPage() {
   const handleDeleteEvent = async () => {
     try {
       setIsDeleting(true);
-      
+
       const response = await AxiosClient.delete("/events", {
-        params: { 
+        params: {
           event_id: event.ID
         }
       });
@@ -153,7 +152,6 @@ export default function EventDetailsPage() {
     return () => cancelAnimationFrame(idAnim);
   }, [id, isAuthenticated]);
 
-  
   const eventDate = event?.Date;
   const eventTime = event?.Time;
   const eventLocation = event?.Location;
@@ -189,7 +187,7 @@ export default function EventDetailsPage() {
         {/* Hero Section Skeleton */}
         <div className="relative">
           <div className="w-full h-64 sm:h-80 lg:h-96 bg-gray-200 animate-pulse"></div>
-          
+
           {/* Navigation Skeleton */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
             <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg">
@@ -264,22 +262,22 @@ export default function EventDetailsPage() {
                 </div>
               ))}
             </div>
+          </div>
         </div>
-      </div>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteEvent}
-        title="Delete Event"
-        message={`Are you sure you want to delete "${event?.Title}"? This action cannot be undone.`}
-        confirmText="Delete Event"
-        isLoading={isDeleting}
-      />
-    </div>
-  );
-}
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteEvent}
+          title="Delete Event"
+          message={`Are you sure you want to delete "${event?.Title}"? This action cannot be undone.`}
+          confirmText="Delete Event"
+          isLoading={isDeleting}
+        />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -299,9 +297,9 @@ export default function EventDetailsPage() {
 
   const handleShare = async () => {
     try {
-      
+
       await recordShare();
-      
+
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
@@ -327,11 +325,11 @@ export default function EventDetailsPage() {
             e.currentTarget.src = defaultImage;
           }}
         />
-        
+
         {/* Navigation */}
         <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,9 +337,9 @@ export default function EventDetailsPage() {
             </svg>
             Back
           </button>
-          
+
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => setShowShareModal(true)}
               className="p-2 rounded-lg bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white transition-all duration-200 shadow-lg"
             >
@@ -352,7 +350,7 @@ export default function EventDetailsPage() {
 
             {/* Delete button - only show if user can delete */}
             {canDelete && (
-              <button 
+              <button
                 onClick={() => setShowDeleteModal(true)}
                 className="p-2 rounded-lg bg-red-500 backdrop-blur-sm text-white hover:bg-red-600 transition-all duration-200 shadow-lg"
                 title="Delete event"
@@ -401,7 +399,7 @@ export default function EventDetailsPage() {
                 </div>
                 Event Details
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-300">
                   <div className="flex items-start gap-3">
@@ -428,9 +426,9 @@ export default function EventDetailsPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 mb-1 text-sm">Location</h3>
                       <p className="text-gray-700 text-sm mb-2">{event.Location}</p>
-                      <a 
-                        href={mapUrl} 
-                        target="_blank" 
+                      <a
+                        href={mapUrl}
+                        target="_blank"
                         rel="noreferrer"
                         className="text-green-600 hover:text-green-800 text-xs font-medium inline-flex items-center gap-1"
                       >
@@ -506,17 +504,16 @@ export default function EventDetailsPage() {
               <div className="space-y-3">
                 {isAuthenticated ? (
                   <>
-                    <button 
+                    <button
                       onClick={toggleAttendance}
-                      className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
-                        isAttending
+                      className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${isAttending
                           ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-lg'
                           : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg'
-                      }`}
+                        }`}
                     >
                       {isAttending ? '✓ Attending' : 'Attend Event'}
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowShareModal(true)}
                       className="w-full py-3 px-4 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold transition-all duration-200"
                     >
@@ -584,7 +581,7 @@ export default function EventDetailsPage() {
                 </div>
                 Share Event
               </h3>
-              <button 
+              <button
                 onClick={() => setShowShareModal(false)}
                 className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
@@ -593,15 +590,15 @@ export default function EventDetailsPage() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={handleShare}
                 className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 font-semibold transition-all duration-200 shadow-lg"
               >
                 Share via Native Share
               </button>
-              <button 
+              <button
                 onClick={async () => {
                   await recordShare();
                   navigator.clipboard.writeText(shareData.url);

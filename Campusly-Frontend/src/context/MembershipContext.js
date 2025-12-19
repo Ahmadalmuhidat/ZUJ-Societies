@@ -9,16 +9,35 @@ export function MembershipProvider({ children }) {
   const [memberships, setMemberships] = useState({});
 
   const fetchMembership = async (societyId) => {
-    if (!isAuthenticated || !user) return;
-    if (!societyId) return;
+    if (!isAuthenticated || !user) {
+      return;
+    }
 
-    if (memberships[societyId]) return;
+    if (!societyId) {
+      return;
+    }
+
+    if (memberships[societyId]) {
+      return;
+    }
 
     try {
       const [memberRes, adminRes, societyRes] = await Promise.all([
-        AxiosClient.get('/societies/members/check', { params: { society_id: societyId } }),
-        AxiosClient.get('/societies/admin/check', { params: { society_id: societyId } }),
-        AxiosClient.get('/societies/info', { params: { society_id: societyId } }),
+        AxiosClient.get('/societies/members/check', {
+          params: {
+            society_id: societyId
+          }
+        }),
+        AxiosClient.get('/societies/admin/check', {
+          params: {
+            society_id: societyId
+          }
+        }),
+        AxiosClient.get('/societies/info', {
+          params: {
+            society_id: societyId
+          }
+        }),
       ]);
 
       const society = societyRes.data.data;
@@ -28,6 +47,7 @@ export function MembershipProvider({ children }) {
 
       let userRole = null;
       let isModerator = false;
+
       if (isMember && society?.Members) {
         const memberData = society.Members.find(m => m.User === user.ID);
         userRole = memberData?.Role || 'member';
@@ -81,13 +101,21 @@ export function MembershipProvider({ children }) {
     }
   };
 
-  // un-used yet
   const clearMembership = async (societyId) => {
     try {
-      await AxiosClient.post('/societies/leave', { society_id: societyId });
+      await AxiosClient.post('/societies/leave', {
+        society_id: societyId
+      });
+
       setMemberships((prev) => ({
         ...prev,
-        [societyId]: { isMember: false, isAdmin: false, isOwner: false, isModerator: false, userRole: null },
+        [societyId]: {
+          isMember: false,
+          isAdmin: false,
+          isOwner: false,
+          isModerator: false,
+          userRole: null
+        },
       }));
     } catch (error) {
       console.error('Error leaving society:', error);
@@ -95,7 +123,12 @@ export function MembershipProvider({ children }) {
   };
 
   return (
-    <MembershipContext.Provider value={{ memberships, fetchMembership, clearMembership }}>
+    <MembershipContext.Provider value={{
+      memberships,
+      fetchMembership,
+      clearMembership
+    }}
+    >
       {children}
     </MembershipContext.Provider>
   );
@@ -127,29 +160,51 @@ export const useSocietyMembership = (societyId) => {
   }, [societyId]);
 
   const canPost = () => {
-    if (!membership.isMember) return false;
+    if (!membership.isMember) {
+      return false;
+    }
     const whoCanPost = membership.permissions.whoCanPost;
-    if (whoCanPost === 'all-members') return true;
-    if (whoCanPost === 'moderators') return membership.isModerator || membership.isAdmin;
-    if (whoCanPost === 'admins') return membership.isAdmin;
+    if (whoCanPost === 'all-members') {
+      return true;
+    }
+    if (whoCanPost === 'moderators') {
+      return membership.isModerator || membership.isAdmin;
+    }
+    if (whoCanPost === 'admins') {
+      return membership.isAdmin;
+    }
     return false;
   };
 
   const canCreateEvents = () => {
-    if (!membership.isMember) return false;
+    if (!membership.isMember) {
+      return false;
+    }
     const whoCanCreateEvents = membership.permissions.whoCanCreateEvents;
-    if (whoCanCreateEvents === 'all-members') return true;
-    if (whoCanCreateEvents === 'moderators') return membership.isModerator || membership.isAdmin;
-    if (whoCanCreateEvents === 'admins') return membership.isAdmin;
+    if (whoCanCreateEvents === 'all-members') {
+      return true;
+    }
+    if (whoCanCreateEvents === 'moderators') {
+      return membership.isModerator || membership.isAdmin;
+    }
+    if (whoCanCreateEvents === 'admins') {
+      return membership.isAdmin;
+    }
     return false;
   };
 
   const canInvite = () => {
     if (!membership.isMember) return false;
     const whoCanInvite = membership.permissions.whoCanInvite;
-    if (whoCanInvite === 'all-members') return true;
-    if (whoCanInvite === 'moderators') return membership.isModerator || membership.isAdmin;
-    if (whoCanInvite === 'admins') return membership.isAdmin;
+    if (whoCanInvite === 'all-members') {
+      return true;
+    }
+    if (whoCanInvite === 'moderators') {
+      return membership.isModerator || membership.isAdmin;
+    }
+    if (whoCanInvite === 'admins') {
+      return membership.isAdmin;
+    }
     return false;
   };
 

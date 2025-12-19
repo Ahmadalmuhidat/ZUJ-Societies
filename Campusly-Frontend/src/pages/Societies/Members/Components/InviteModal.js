@@ -10,7 +10,6 @@ export default function InviteModal({ isOpen, onClose, societyId, onInviteSent }
   const [isInviting, setIsInviting] = useState(false);
   const [inviteMessage, setInviteMessage] = useState('');
 
-  
   const searchUsers = async (query) => {
     if (query.length < 2) {
       setSearchResults([]);
@@ -44,7 +43,9 @@ export default function InviteModal({ isOpen, onClose, societyId, onInviteSent }
   }, [searchTerm]);
 
   const handleInvite = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      return;
+    }
 
     try {
       setIsInviting(true);
@@ -84,7 +85,9 @@ export default function InviteModal({ isOpen, onClose, societyId, onInviteSent }
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

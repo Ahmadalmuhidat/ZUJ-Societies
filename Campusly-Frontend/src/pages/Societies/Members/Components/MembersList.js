@@ -13,7 +13,6 @@ export default function MembersList({ id, members, setMembers }) {
   const [sortBy, setSortBy] = useState('name');
   const { isAuthenticated } = useAuth();
   const { isAdmin, isOwner } = useSocietyMembership(id);
-
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newRole, setNewRole] = useState('');

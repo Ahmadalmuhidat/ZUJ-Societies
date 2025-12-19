@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import AxiosClient from '../../../../config/axios';
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '../../../../shared/components/DeleteConfirmationModal';
+import { getEventStatus } from '../../../../utils/dateUtils';
 
-export default function EventsList({ id, events, isEventCompleted, searchTerm, isMember, onEventDeleted }) {
+export default function EventsList({ id, events, searchTerm, filter, isMember, onEventDeleted }) {
   const { isAuthenticated, user } = useAuth();
   const { isAdmin } = useSocietyMembership(id);
-  const [filter, setFilter] = useState('upcoming');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -49,7 +49,10 @@ export default function EventsList({ id, events, isEventCompleted, searchTerm, i
 
   const filteredEvents = events
     .filter(event => {
-      const matchesFilter = filter === 'all' || isEventCompleted(event) === filter;
+      const status = getEventStatus(event);
+      // If there's a search term, we show all events that match the search term
+      // otherwise we follow the filter
+      const matchesFilter = searchTerm ? true : (filter === 'all' || status === filter);
       const matchesSearch = event.Title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.Description.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesFilter && matchesSearch;
@@ -61,7 +64,7 @@ export default function EventsList({ id, events, isEventCompleted, searchTerm, i
       return new Date(b.Date).getTime() - new Date(a.Date).getTime();
     });
 
-  
+
   const canDeleteEvent = (event) => {
     if (!isAuthenticated || !user) return false;
     return event.User === user.ID || isAdmin;
@@ -79,9 +82,9 @@ export default function EventsList({ id, events, isEventCompleted, searchTerm, i
 
     try {
       setIsDeleting(true);
-      
+
       const response = await AxiosClient.delete("/events", {
-        params: { 
+        params: {
           event_id: eventToDelete.ID
         }
       });
@@ -115,8 +118,8 @@ export default function EventsList({ id, events, isEventCompleted, searchTerm, i
                   onError={e => { e.target.src = `https://via.placeholder.com/400x300/3B82F6/ffffff?text=${encodeURIComponent(event.Title)}` }}
                 />
                 <div className="absolute top-4 right-4">
-                  <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shadow-lg backdrop-blur-sm ${getStatusBadge(isEventCompleted(event))}`}>
-                    {isEventCompleted(event)}
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shadow-lg backdrop-blur-sm ${getStatusBadge(getEventStatus(event))}`}>
+                    {getEventStatus(event)}
                   </span>
                 </div>
                 {canDeleteEvent(event) && (

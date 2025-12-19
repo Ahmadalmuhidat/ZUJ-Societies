@@ -1,6 +1,7 @@
 import React from 'react';
+import { getEventStatus } from '../../../../utils/dateUtils';
 
-export default function EventStats({ events, isEventCompleted }) {
+export default function EventStats({ events }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 
@@ -15,7 +16,7 @@ export default function EventStats({ events, isEventCompleted }) {
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Upcoming Events</p>
             <p className="text-xl font-bold text-gray-900">
-              {events.filter(e => isEventCompleted(e) === 'upcoming').length}
+              {events.filter(e => getEventStatus(e) === 'upcoming').length}
             </p>
           </div>
         </div>
@@ -32,7 +33,7 @@ export default function EventStats({ events, isEventCompleted }) {
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Completed Events</p>
             <p className="text-xl font-bold text-gray-900">
-              {events.filter(e => isEventCompleted(e) === 'completed').length}
+              {events.filter(e => getEventStatus(e) === 'completed').length}
             </p>
           </div>
         </div>

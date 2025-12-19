@@ -8,7 +8,9 @@ export default function SocietyNav({ societyId }) {
 
   const basePath = `/societies/${societyId}`;
 
-  if (!isMember) return null;
+  if (!isMember) {
+    return null;
+  }
 
   const navItems = [
     { 

@@ -21,17 +21,17 @@ export default function PrivacyPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="px-8 py-12">
             <div className="prose prose-lg max-w-none">
-              
+
               {/* Introduction */}
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  The University who utilize the platform is committed to protecting your privacy and personal information. 
-                  This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the Campusly 
+                  The University who utilize the platform is committed to protecting your privacy and personal information.
+                  This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the Campusly
                   platform ("Platform" or "Service").
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  By using our Platform, you consent to the data practices described in this Privacy Policy. If you do not agree with 
+                  By using our Platform, you consent to the data practices described in this Privacy Policy. If you do not agree with
                   the terms of this Privacy Policy, please do not use our Platform.
                 </p>
               </section>
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
               {/* Information We Collect */}
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Information We Collect</h2>
-                
+
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">2.1 Personal Information</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
                   We collect personal information that you voluntarily provide to us when you:
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">2.3 Third-Party Information</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  We may receive information about you from third parties, such as other users who invite you to join societies 
+                  We may receive information about you from third parties, such as other users who invite you to join societies
                   or events, or from University systems for verification purposes.
                 </p>
               </section>
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
                   <h4 className="font-semibold text-blue-800 mb-2">Legal Basis for Processing</h4>
                   <p className="text-blue-700 text-sm">
-                    We process your personal information based on your consent, our legitimate interests in providing 
+                    We process your personal information based on your consent, our legitimate interests in providing
                     educational services, and compliance with University policies and legal requirements.
                   </p>
                 </div>
@@ -100,10 +100,10 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Information Sharing and Disclosure</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  We do not sell, trade, or rent your personal information to third parties. We may share your information 
+                  We do not sell, trade, or rent your personal information to third parties. We may share your information
                   in the following circumstances:
                 </p>
-                
+
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">4.1 Within the Platform</h3>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-4">
                   <li>With other members of societies you join</li>
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Data Security</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  We implement appropriate technical and organizational measures to protect your personal information against 
+                  We implement appropriate technical and organizational measures to protect your personal information against
                   unauthorized access, alteration, disclosure, or destruction. These measures include:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-4">
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
                   <li>Staff training on data protection practices</li>
                 </ul>
                 <p className="text-gray-700 leading-relaxed">
-                  However, no method of transmission over the internet or electronic storage is 100% secure. While we strive 
+                  However, no method of transmission over the internet or electronic storage is 100% secure. While we strive
                   to protect your information, we cannot guarantee absolute security.
                 </p>
               </section>
@@ -150,7 +150,7 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Data Retention</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, 
+                  We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy,
                   unless a longer retention period is required or permitted by law.
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2">
@@ -194,7 +194,7 @@ export default function PrivacyPage() {
                   <li><strong>Security Cookies:</strong> Protect against fraud and unauthorized access</li>
                 </ul>
                 <p className="text-gray-700 leading-relaxed">
-                  You can control cookie settings through your browser preferences, but disabling certain cookies may 
+                  You can control cookie settings through your browser preferences, but disabling certain cookies may
                   affect platform functionality.
                 </p>
               </section>
@@ -203,7 +203,7 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Third-Party Services</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Our Platform may integrate with third-party services for enhanced functionality. These services have 
+                  Our Platform may integrate with third-party services for enhanced functionality. These services have
                   their own privacy policies, and we encourage you to review them:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2">
@@ -218,8 +218,8 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">10. International Data Transfers</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  Your personal information is primarily processed within Jordan. If we need to transfer your information 
-                  internationally, we will ensure appropriate safeguards are in place to protect your privacy and comply 
+                  Your personal information is primarily processed within Jordan. If we need to transfer your information
+                  internationally, we will ensure appropriate safeguards are in place to protect your privacy and comply
                   with applicable data protection laws.
                 </p>
               </section>
@@ -228,8 +228,8 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Children's Privacy</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  Our Platform is designed for University of Jordan students, faculty, and staff. We do not knowingly 
-                  collect personal information from children under 16. If we become aware that we have collected such 
+                  Our Platform is designed for University of Jordan students, faculty, and staff. We do not knowingly
+                  collect personal information from children under 16. If we become aware that we have collected such
                   information, we will take steps to delete it promptly.
                 </p>
               </section>
@@ -238,8 +238,8 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Changes to This Privacy Policy</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  We may update this Privacy Policy from time to time. We will notify you of any material changes by 
-                  posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage you 
+                  We may update this Privacy Policy from time to time. We will notify you of any material changes by
+                  posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage you
                   to review this Privacy Policy periodically for any changes.
                 </p>
               </section>
@@ -263,7 +263,7 @@ export default function PrivacyPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">14. Compliance</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  This Privacy Policy complies with applicable data protection laws, including the Jordanian Personal Data 
+                  This Privacy Policy complies with applicable data protection laws, including the Jordanian Personal Data
                   Protection Law and international best practices for educational institutions.
                 </p>
               </section>

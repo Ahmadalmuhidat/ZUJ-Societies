@@ -33,7 +33,6 @@ export default function SocietyMembers() {
   };
 
   const handleInviteSent = () => {
-
     getAllSocietyMembers();
   };
 

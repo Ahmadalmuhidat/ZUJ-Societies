@@ -39,14 +39,21 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
     try {
       const response = await AxiosClient.get('/auth/login', {
-        params: { email, password },
+        params: {
+          email: email,
+          password: password,
+        },
       });
 
       if (response.status === 200) {
         const token = response.data.data;
 
-        if (rememberMe) localStorage.setItem('token', token);
-        else sessionStorage.setItem('token', token);
+        if (rememberMe) {
+          localStorage.setItem('token', token);
+        }
+        else {
+          sessionStorage.setItem('token', token);
+        }
 
         await getUserInformation();
         navigate('/');

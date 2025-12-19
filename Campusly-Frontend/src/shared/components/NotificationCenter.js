@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../hooks/useNotifications';
 
 export default function NotificationCenter() {
-  const { user } = useAuth();
   const { 
     notifications, 
     unreadCount, 
@@ -99,7 +97,7 @@ export default function NotificationCenter() {
             {notifications.slice(0, 3).map((notification) => (
               <div
                 key={notification.id}
-                className={`p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${!(notification.Read || notification.read) ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                className={`p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${!(notification.Read) ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
                 onClick={() => markAsRead(notification.ID || notification.id)}
               >
                 <div className="flex items-start space-x-3">
@@ -120,7 +118,7 @@ export default function NotificationCenter() {
                       })}
                     </p>
                   </div>
-                  {!(notification.Read || notification.read) && (
+                  {!(notification.Read) && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
                   )}
                 </div>

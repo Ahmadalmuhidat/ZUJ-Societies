@@ -8,7 +8,7 @@ export default function TrendingPage() {
   const [trendingPosts, setTrendingPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [timeFilter, setTimeFilter] = useState('7'); 
+  const [timeFilter, setTimeFilter] = useState('7');
   const [limit, setLimit] = useState(20);
   const [isFilterChanging, setIsFilterChanging] = useState(false);
 
@@ -16,19 +16,18 @@ export default function TrendingPage() {
     try {
       if (isFilterChange) {
         setIsFilterChanging(true);
-        
+
         setTrendingPosts([]);
       } else {
         setLoading(true);
       }
 
       try {
-        const response = await AxiosClient.get('/analytics/trending-posts', { 
-          params: { limit, days: timeFilter } 
+        const response = await AxiosClient.get('/analytics/trending-posts', {
+          params: { limit, days: timeFilter }
         });
-        
+
         if (response.status === 200) {
-          
           const postsWithLikeStatus = response.data.data.map(post => ({
             ...post,
             IsLiked: post.IsLiked || false,
@@ -46,19 +45,16 @@ export default function TrendingPage() {
 
       if (response.status === 200) {
         const posts = response.data.data || [];
-        
-        
-        const trendingPosts = posts
-          .map(post => ({
-            ...post,
-            IsLiked: post.IsLiked || false,
-            Likes: post.Likes || 0,
-            Comments: post.Comments || post.CommentsCount || 0,
-            engagement: (post.Likes || 0) + (post.Comments || post.CommentsCount || 0)
-          }))
-          .sort((a, b) => b.engagement - a.engagement)
-          .slice(0, limit);
-        
+
+
+        const trendingPosts = posts.map(post => ({
+          ...post,
+          IsLiked: post.IsLiked || false,
+          Likes: post.Likes || 0,
+          Comments: post.Comments || post.CommentsCount || 0,
+          engagement: (post.Likes || 0) + (post.Comments || post.CommentsCount || 0)
+        })).sort((a, b) => b.engagement - a.engagement).slice(0, limit);
+
         setTrendingPosts(trendingPosts);
       }
     } catch (error) {
@@ -122,8 +118,8 @@ export default function TrendingPage() {
                 <p className="text-gray-600 mt-1">Discover the most engaging content from your communities</p>
               </div>
             </div>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,11 +136,10 @@ export default function TrendingPage() {
                 key={filter.value}
                 onClick={() => setTimeFilter(filter.value)}
                 disabled={isFilterChanging}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  timeFilter === filter.value
-                    ? 'bg-red-500 text-white shadow-lg scale-105 ring-2 ring-red-200'
-                    : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 hover:shadow-md'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${timeFilter === filter.value
+                  ? 'bg-red-500 text-white shadow-lg scale-105 ring-2 ring-red-200'
+                  : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }`}
               >
                 {isFilterChanging && timeFilter === filter.value ? (
                   <div className="flex items-center">
@@ -186,16 +181,16 @@ export default function TrendingPage() {
           <div className="flex justify-center items-center py-8">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               <span className="ml-3 text-gray-600 font-medium">Loading trending posts...</span>
             </div>
           </div>
         )}
 
         {/* Posts List */}
-        <div 
-          key={timeFilter} 
+        <div
+          key={timeFilter}
           className={`space-y-6 transition-all duration-500 ${mounted && !isFilterChanging ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
         >
           {trendingPosts.length === 0 && !isFilterChanging ? (
@@ -207,8 +202,8 @@ export default function TrendingPage() {
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No trending posts found</h3>
               <p className="text-gray-600 mb-4">Try adjusting your time filter or check back later for new content.</p>
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,8 +214,8 @@ export default function TrendingPage() {
             </div>
           ) : (
             trendingPosts.map((post, index) => (
-              <div 
-                key={post.ID} 
+              <div
+                key={post.ID}
                 className="relative group animate-fade-in-up"
                 style={{
                   animationDelay: `${index * 0.1}s`
@@ -232,7 +227,7 @@ export default function TrendingPage() {
                     #{index + 1}
                   </div>
                 </div>
-                
+
                 {/* Post Card with Trending Styling */}
                 <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl shadow-card border-2 border-red-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-red-200">
                   <PostCard post={post} onPostDeleted={handlePostDeleted} />

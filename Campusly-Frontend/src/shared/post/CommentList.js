@@ -17,7 +17,9 @@ export default function CommentList({ comments, postId, onCommentDeleted }) {
   const hasMore = visibleCount < comments.length;
 
   const handleDeleteComment = async () => {
-    if (!commentToDelete || !isAuthenticated) return;
+    if (!commentToDelete || !isAuthenticated) {
+      return;
+    }
     
     setIsDeleting(true);
     try {
@@ -53,8 +55,7 @@ export default function CommentList({ comments, postId, onCommentDeleted }) {
   };
   
   const showDeleteCommentButton = (comment) => {    
-    const canDelete = isAuthenticated && user && (user.ID === comment.User_ID || user.ID === comment.User || user.Role === 'admin');
-    return canDelete;
+    return isAuthenticated && user && (user.ID === comment.User_ID || user.ID === comment.User || user.Role === 'admin');
   };
 
   useEffect(() => {

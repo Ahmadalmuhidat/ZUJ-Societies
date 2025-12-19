@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AxiosClient from '../../config/axios';
 import { toast } from 'react-toastify';
@@ -14,12 +14,12 @@ export default function QuickPostCreator({ onPostCreated }) {
   const { user, isAuthenticated } = useAuth();
   const textareaRef = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       fetchUserSocieties();
 

@@ -21,17 +21,17 @@ export default function TermsPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="px-8 py-12">
             <div className="prose prose-lg max-w-none">
-              
+
               {/* Introduction */}
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Welcome to Campusly, the official student society management platform of the Universities in Jordan. 
-                  These Terms of Service ("Terms") govern your use of our platform and services. By accessing or using Campusly, 
+                  Welcome to Campusly, the official student society management platform of the Universities in Jordan.
+                  These Terms of Service ("Terms") govern your use of our platform and services. By accessing or using Campusly,
                   you agree to be bound by these Terms.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  If you do not agree to these Terms, please do not use our platform. We reserve the right to modify these Terms 
+                  If you do not agree to these Terms, please do not use our platform. We reserve the right to modify these Terms
                   at any time, and your continued use of the platform constitutes acceptance of any changes.
                 </p>
               </section>
@@ -40,7 +40,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Acceptance of Terms</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  By creating an account, accessing, or using Campusly, you acknowledge that you have read, understood, 
+                  By creating an account, accessing, or using Campusly, you acknowledge that you have read, understood,
                   and agree to be bound by these Terms and our Privacy Policy.
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2">
@@ -55,7 +55,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Platform Description</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Campusly is a digital platform designed to facilitate student society management, event organization, 
+                  Campusly is a digital platform designed to facilitate student society management, event organization,
                   and community engagement within the University of Jordan. Our services include:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2">
@@ -102,7 +102,7 @@ export default function TermsPage() {
                   </ul>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
-                  We reserve the right to remove any content that violates these guidelines and may suspend or terminate 
+                  We reserve the right to remove any content that violates these guidelines and may suspend or terminate
                   accounts that repeatedly violate these terms.
                 </p>
               </section>
@@ -111,7 +111,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Privacy and Data Protection</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Your privacy is important to us. Our collection, use, and protection of your personal information 
+                  Your privacy is important to us. Our collection, use, and protection of your personal information
                   is governed by our Privacy Policy, which is incorporated into these Terms by reference.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
@@ -123,11 +123,11 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Intellectual Property</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  The Campusly platform, including its design, functionality, and content, is owned by the University of Jordan 
+                  The Campusly platform, including its design, functionality, and content, is owned by the University of Jordan
                   and protected by intellectual property laws.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  You retain ownership of content you post on the platform, but by posting content, you grant Campusly 
+                  You retain ownership of content you post on the platform, but by posting content, you grant Campusly
                   a non-exclusive, royalty-free license to use, display, and distribute your content in connection with the platform.
                 </p>
               </section>
@@ -136,11 +136,11 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Account Termination</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  We may suspend or terminate your account at any time for violations of these Terms or for any other reason 
+                  We may suspend or terminate your account at any time for violations of these Terms or for any other reason
                   at our sole discretion.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  You may terminate your account at any time by contacting our support team. Upon termination, your access 
+                  You may terminate your account at any time by contacting our support team. Upon termination, your access
                   to the platform will be revoked, and your content may be deleted.
                 </p>
               </section>
@@ -149,7 +149,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Disclaimers</h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Campusly is provided "as is" without warranties of any kind. We do not guarantee that the platform 
+                  Campusly is provided "as is" without warranties of any kind. We do not guarantee that the platform
                   will be uninterrupted, error-free, or secure.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
@@ -161,7 +161,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Limitation of Liability</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  To the maximum extent permitted by law, the University of Jordan and Campusly shall not be liable for 
+                  To the maximum extent permitted by law, the University of Jordan and Campusly shall not be liable for
                   any indirect, incidental, special, or consequential damages arising from your use of the platform.
                 </p>
               </section>
@@ -170,7 +170,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Governing Law</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  These Terms are governed by the laws of the Hashemite Kingdom of Jordan. Any disputes arising from these 
+                  These Terms are governed by the laws of the Hashemite Kingdom of Jordan. Any disputes arising from these
                   Terms or your use of the platform shall be resolved in the courts of Jordan.
                 </p>
               </section>
@@ -193,8 +193,8 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">13. Changes to Terms</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  We reserve the right to modify these Terms at any time. We will notify users of significant changes 
-                  through the platform or via email. Your continued use of the platform after such modifications 
+                  We reserve the right to modify these Terms at any time. We will notify users of significant changes
+                  through the platform or via email. Your continued use of the platform after such modifications
                   constitutes acceptance of the updated Terms.
                 </p>
               </section>

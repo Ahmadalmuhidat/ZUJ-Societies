@@ -1,7 +1,9 @@
 import React from 'react';
 
 export default function DangerZone({ leaveSociety, setShowDeleteConfirm, isOwner }) {
-  if (!isOwner) return null; // Safety check
+  if (!isOwner) {
+    return null;
+  }
 
   return (
     <div>

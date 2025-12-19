@@ -101,8 +101,8 @@ export default function UserSettings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${activeTab === tab.id
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 <span className="mr-2">{tab.icon}</span>

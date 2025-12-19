@@ -50,7 +50,9 @@ export default function PostCard({ post, onPostDeleted }) {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    if (!commentText.trim()) {
+      return;
+    }
 
     const tempId = Date.now().toString();
     const optimisticComment = {
@@ -70,7 +72,9 @@ export default function PostCard({ post, onPostDeleted }) {
         post_id: post.ID,
       });
 
-      if (response.status !== 201) throw new Error('Failed to add comment');
+      if (response.status !== 201) {
+        throw new Error('Failed to add comment');
+      }
     } catch (error) {
       console.error('Failed to add comment:', error);
       setComments((prev) => prev.filter((c) => c.id !== tempId));
@@ -122,7 +126,9 @@ export default function PostCard({ post, onPostDeleted }) {
           post_id: post.ID,
         },
       });
-      if (response.status === 200) setComments(response.data.data);
+      if (response.status === 200) {
+        setComments(response.data.data);
+      }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     } finally {
@@ -280,11 +286,10 @@ export default function PostCard({ post, onPostDeleted }) {
                 <div className="flex items-center gap-6">
                   <button
                     onClick={handleLike}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                      isLiked 
-                        ? 'text-primary-600 bg-primary-50' 
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${isLiked
+                        ? 'text-primary-600 bg-primary-50'
                         : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <svg className="w-4 h-4" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -292,8 +297,8 @@ export default function PostCard({ post, onPostDeleted }) {
                     {likesCount} Likes
                   </button>
 
-                  <button 
-                    onClick={toggleComments} 
+                  <button
+                    onClick={toggleComments}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-all duration-200"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,8 +307,8 @@ export default function PostCard({ post, onPostDeleted }) {
                     {comments.length} Comments
                   </button>
 
-                  <button 
-                    onClick={openReportModal} 
+                  <button
+                    onClick={openReportModal}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,8 +352,8 @@ export default function PostCard({ post, onPostDeleted }) {
                     onChange={(e) => setCommentText(e.target.value)}
                     className="flex-1 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="bg-gradient-to-r from-primary-500 to-blue-500 text-white px-6 py-3 rounded-xl hover:from-primary-600 hover:to-blue-600 transition-all duration-200 shadow-lg"
                   >
                     Post

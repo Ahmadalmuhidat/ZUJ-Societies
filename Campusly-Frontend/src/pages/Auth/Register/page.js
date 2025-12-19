@@ -29,9 +29,9 @@ export default function Signup() {
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Signup failed:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.error_message || 'Registration failed. Please try again.' 
+      return {
+        success: false,
+        error: error.response?.data?.error_message || 'Registration failed. Please try again.'
       };
     }
   };
@@ -43,7 +43,7 @@ export default function Signup() {
       [name]: type === 'checkbox' ? checked : value,
     });
 
-    
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -103,8 +103,8 @@ export default function Signup() {
         navigate('/login');
       } else {
         const errorMessage = result.error;
-        
-        
+
+
         if (errorMessage.includes('Email already exists')) {
           setErrors({ ...errors, email: errorMessage });
         } else if (errorMessage.includes('Student ID already exists')) {
@@ -132,9 +132,9 @@ export default function Signup() {
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/40 via-transparent to-cyan-50/40"></div>
         <div className="absolute top-10 left-10 w-64 h-64 bg-indigo-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-20 right-20 w-48 h-48 bg-cyan-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
-        <div className="absolute bottom-20 left-1/4 w-56 h-56 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '3s'}}></div>
-        <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-blue-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '4.5s'}}></div>
+        <div className="absolute top-20 right-20 w-48 h-48 bg-cyan-200/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute bottom-20 left-1/4 w-56 h-56 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-blue-200/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4.5s' }}></div>
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.15) 1px, transparent 0)`,
@@ -177,9 +177,8 @@ export default function Signup() {
                     value={formData.photo}
                     onChange={handleChange}
                     placeholder="https://example.com/photo.jpg"
-                    className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.photo ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-3 py-3 border ${errors.photo ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
                 {errors.photo && <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -201,9 +200,8 @@ export default function Signup() {
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder="First Name"
-                    className={`block w-full px-3 py-3 border ${
-                      errors.firstName ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full px-3 py-3 border ${errors.firstName ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                   {errors.firstName && <p className="mt-2 text-sm text-red-600 flex items-center">
                     <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -222,9 +220,8 @@ export default function Signup() {
                     value={formData.lastName}
                     onChange={handleChange}
                     placeholder="Last Name"
-                    className={`block w-full px-3 py-3 border ${
-                      errors.lastName ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full px-3 py-3 border ${errors.lastName ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                   {errors.lastName && <p className="mt-2 text-sm text-red-600 flex items-center">
                     <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -251,9 +248,8 @@ export default function Signup() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-3 py-3 border ${errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
                 {errors.email && <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -280,9 +276,8 @@ export default function Signup() {
                     value={formData.student_id}
                     onChange={handleChange}
                     placeholder="Enter your student ID"
-                    className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.student_id ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-3 py-3 border ${errors.student_id ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
                 {errors.student_id && <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -309,9 +304,8 @@ export default function Signup() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Create a password"
-                    className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-3 py-3 border ${errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-200 text-sm`}
                   />
                 </div>
                 {errors.password && <p className="mt-2 text-sm text-red-600 flex items-center">

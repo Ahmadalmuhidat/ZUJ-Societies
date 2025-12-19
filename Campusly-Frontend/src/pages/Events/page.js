@@ -53,9 +53,9 @@ export default function Events() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {events.map((event) => (
-                  <EventCard key={event.ID} {...event} onEventDeleted={handleEventDeleted} />
-                ))}
+                  {events.map((event) => (
+                    <EventCard key={event.ID} {...event} onEventDeleted={handleEventDeleted} />
+                  ))}
                 </div>
 
                 {events.length === 0 && (

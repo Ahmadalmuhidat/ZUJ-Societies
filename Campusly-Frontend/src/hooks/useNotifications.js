@@ -16,14 +16,14 @@ export const useNotifications = () => {
 
       if (response.status === 200) {
         setNotifications(response.data.data);
-        setUnreadCount(response.data.data.filter(n => !(n.Read || n.read)).length);
+        setUnreadCount(response.data.data.filter(notification => !(notification.Read)).length);
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
   }, []);
 
-  const connectSSE = useCallback(() => {
+  const connectServerSentEventsClient = useCallback(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) return;
 
@@ -32,14 +32,14 @@ export const useNotifications = () => {
       setEventSource(null);
     }
 
-    const sse = new EventSource(`${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/notifications/sse?token=${token}`);
+    const serverSentEventsClient = new EventSource(`${process.env.REACT_APP_API_URL}/notifications/sse?token=${token}`);
 
-    sse.onopen = () => {
+    serverSentEventsClient.onopen = () => {
       setIsConnected(true);
       setReconnectAttempts(0);
     };
 
-    sse.onmessage = (event) => {
+    serverSentEventsClient.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
 
@@ -80,27 +80,27 @@ export const useNotifications = () => {
       }
     };
 
-    sse.onerror = (error) => {
+    serverSentEventsClient.onerror = (error) => {
       console.error('SSE connection error:', error);
       setIsConnected(false);
 
-      if (sse.readyState === EventSource.CLOSED && reconnectAttempts < maxReconnectAttempts) {
+      if (serverSentEventsClient.readyState === EventSource.CLOSED && reconnectAttempts < maxReconnectAttempts) {
         const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-        console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+        // console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
 
         setTimeout(() => {
           setReconnectAttempts(prev => prev + 1);
-          connectSSE();
+          connectServerSentEventsClient();
         }, delay);
       } else if (reconnectAttempts >= maxReconnectAttempts) {
         console.error('Max reconnection attempts reached. Please refresh the page.');
       }
     };
 
-    setEventSource(sse);
+    setEventSource(serverSentEventsClient);
   }, []);
 
-  const disconnectSSE = useCallback(() => {
+  const disconnectServerSentEventsClient = useCallback(() => {
     if (eventSource) {
       eventSource.close();
       setEventSource(null);
@@ -115,10 +115,13 @@ export const useNotifications = () => {
       });
 
       setNotifications(prev =>
-        prev.map(notif =>
-          notif.ID === notificationId || notif.id === notificationId
-            ? { ...notif, Read: true, read: true }
-            : notif
+        prev.map(notification =>
+          notification.ID === notificationId || notification.id === notificationId
+            ? {
+              ...notification,
+              Read: true
+            }
+            : notification
         )
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
@@ -131,7 +134,10 @@ export const useNotifications = () => {
     try {
       await AxiosClient.post('/notifications/mark-all-read');
 
-      setNotifications(prev => prev.map(notif => ({ ...notif, Read: true, read: true })));
+      setNotifications(prev => prev.map(notification => ({
+        ...notification,
+        Read: true
+      })));
       setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
@@ -151,19 +157,19 @@ export const useNotifications = () => {
     requestNotificationPermission();
 
     const timer = setTimeout(() => {
-      connectSSE();
+      connectServerSentEventsClient();
     }, 1000);
 
     return () => {
       clearTimeout(timer);
-      disconnectSSE();
+      disconnectServerSentEventsClient();
     };
   }, []);
 
   const reconnect = useCallback(() => {
     setReconnectAttempts(0);
-    connectSSE();
-  }, [connectSSE]);
+    connectServerSentEventsClient();
+  }, [connectServerSentEventsClient]);
 
   return {
     notifications,
@@ -174,8 +180,8 @@ export const useNotifications = () => {
     markAsRead,
     markAllAsRead,
     fetchNotifications,
-    connectSSE,
-    disconnectSSE,
+    connectServerSentEventsClient,
+    disconnectServerSentEventsClient,
     reconnect
   };
 };

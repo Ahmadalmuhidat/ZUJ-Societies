@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotifications } from '../../hooks/useNotifications';
 import AxiosClient from '../../config/axios';
 
 export default function NotificationsPage() {
-  const [invitationResponses, setInvitationResponses] = React.useState({});
+  const [invitationResponses, setInvitationResponses] = useState({});
 
   const {
     notifications,
@@ -218,7 +218,7 @@ export default function NotificationsPage() {
               <div
                 key={notification.ID || notification.id}
                 className={`rounded-2xl shadow-card border-2 overflow-hidden transition-all duration-300 hover:shadow-xl ${getNotificationCardStyle(notification.Type || notification.type)
-                  } ${!(notification.Read || notification.read)
+                  } ${!(notification.Read)
                     ? `border-l-4 ${getNotificationBorderAccent(notification.Type || notification.type)}`
                     : ''
                   }`}
@@ -242,7 +242,7 @@ export default function NotificationsPage() {
                               <h3 className="text-lg font-semibold text-gray-900">{notification.Title || notification.title}</h3>
                               <div className="flex items-center space-x-2">
                                 <span className="text-sm text-gray-500">{formatTime(notification.CreatedAt || notification.time)}</span>
-                                {!(notification.Read || notification.read) && (
+                                {!(notification.Read) && (
                                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                 )}
                               </div>
@@ -296,7 +296,7 @@ export default function NotificationsPage() {
                           <h3 className="text-lg font-semibold text-gray-900">{notification.Title || notification.title}</h3>
                           <div className="flex items-center space-x-2">
                             <span className="text-sm text-gray-500">{formatTime(notification.CreatedAt || notification.time)}</span>
-                            {!(notification.Read || notification.read) && (
+                            {!(notification.Read) && (
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                             )}
                           </div>

@@ -166,7 +166,6 @@ export default function SocietySettings() {
     }));
   };
 
-
   const saveSwitchSettings = async () => {
     try {
       const response = await AxiosClient.put('/societies', {

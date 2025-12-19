@@ -182,8 +182,8 @@ export default function NewEventForm() {
           {steps.map((step, index) => (
             <div key={step.number} className="flex items-center">
               <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${currentStep >= step.number
-                  ? 'bg-primary-600 border-primary-600 text-white'
-                  : 'border-gray-300 text-gray-400'
+                ? 'bg-primary-600 border-primary-600 text-white'
+                : 'border-gray-300 text-gray-400'
                 }`}>
                 {currentStep > step.number ? (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -283,8 +283,8 @@ export default function NewEventForm() {
                       type="button"
                       onClick={() => handleInputChange('category', category.value)}
                       className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${formData.category === category.value
-                          ? 'border-primary-500 bg-primary-50 text-primary-700'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-primary-500 bg-primary-50 text-primary-700'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -540,8 +540,8 @@ export default function NewEventForm() {
                       type="button"
                       onClick={() => handleTagToggle(tag)}
                       className={`px-3 py-1 rounded-full text-sm transition-all duration-200 ${formData.tags.includes(tag)
-                          ? 'bg-primary-100 text-primary-700 border border-primary-200'
-                          : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                        ? 'bg-primary-100 text-primary-700 border border-primary-200'
+                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                         }`}
                     >
                       {tag}
@@ -587,8 +587,8 @@ export default function NewEventForm() {
                 type="submit"
                 disabled={isSubmitting}
                 className={`px-6 py-3 rounded-xl transition-colors ${isSubmitting
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-primary-600 hover:bg-primary-700 text-white'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-primary-600 hover:bg-primary-700 text-white'
                   }`}
               >
                 {isSubmitting ? (

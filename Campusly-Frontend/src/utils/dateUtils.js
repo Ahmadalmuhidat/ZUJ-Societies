@@ -1,35 +1,28 @@
 export const parseEventDate = (dateInput, timeInput = null) => {
   try {
-    if (!dateInput) return null;
+    if (!dateInput) {
+      return null;
+    }
 
     let eventDate;
-
-    
     if (dateInput instanceof Date) {
       eventDate = new Date(dateInput);
-    } 
-    
-    else if (typeof dateInput === 'string') {
+    } else if (typeof dateInput === 'string') {
       eventDate = new Date(dateInput);
-    } 
-    
-    else {
+    } else {
       console.warn('Invalid date input type:', typeof dateInput, dateInput);
       return null;
     }
 
-    
     if (isNaN(eventDate.getTime())) {
       console.warn('Invalid date parsed:', dateInput);
       return null;
     }
 
-    
     if (timeInput && typeof timeInput === 'string' && timeInput.includes(':')) {
       const [hours, minutes] = timeInput.split(':');
       eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
     }
-
     return eventDate;
   } catch (error) {
     console.error('Error parsing event date:', error, { dateInput, timeInput });
@@ -47,13 +40,21 @@ export const getEventStatus = (event) => {
     }
 
     const now = new Date();
-    const isPast = eventDate < now;
-    
-    
-    const hoursDiff = (now - eventDate) / (1000 * 60 * 60);
-    const isCompleted = isPast && hoursDiff > 24;
-    
-    return isCompleted ? 'completed' : 'upcoming';
+    const diffMs = now - eventDate;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    // If event is in the future
+    if (diffMs < 0) {
+      return 'upcoming';
+    }
+
+    // If event started within the last 24 hours, consider it 'ongoing'
+    if (diffHours >= 0 && diffHours <= 24) {
+      return 'ongoing';
+    }
+
+    // Otherwise, it's completed
+    return 'completed';
   } catch (error) {
     console.error('Error determining event status:', error, event);
     return 'upcoming'; 

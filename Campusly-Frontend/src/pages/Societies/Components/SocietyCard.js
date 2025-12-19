@@ -1,18 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 
 export default function SocietyCard(props) {
   const navigate = useNavigate();
-  const [joined, setJoined] = useState(false);
   const defaultImage = 'https://img.freepik.com/free-vector/multicultural-people-standing-together_74855-6583.jpg';
 
   const handleClick = () => navigate(`/societies/${props.ID}`);
-
-  const handleJoin = (e) => {
-    e.stopPropagation();
-    setJoined(true);
-    // TODO: trigger join request API call
-  };
 
   return (
     <div 

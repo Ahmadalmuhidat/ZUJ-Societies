@@ -1,14 +1,7 @@
 import AxiosClient from "../../../../config/axios";
 import { toast } from "react-toastify";
 
-export default function ChangeRole({
-  selectedMember,
-  newRole,
-  setNewRole,
-  society_id,
-  getAllSocietyMembers,
-  setShowModal
-}) {
+export default function ChangeRole({selectedMember, newRole, setNewRole, society_id, getAllSocietyMembers, setShowModal}) {
 
   const handleRoleUpdate = async () => {
     if (!selectedMember) {

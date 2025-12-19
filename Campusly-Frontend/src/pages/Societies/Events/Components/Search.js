@@ -40,7 +40,6 @@ export default function Search({ filter, setFilter, searchTerm, setSearchTerm })
             <option value="upcoming">Upcoming</option>
             <option value="ongoing">Ongoing</option>
             <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
           </select>
         </div>
 
