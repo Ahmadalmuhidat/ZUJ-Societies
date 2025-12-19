@@ -22,7 +22,7 @@ export default function NotificationsPage() {
           try {
             const response = await AxiosClient.post('/societies/members/invites/check-status', {
               invitation_id: notif.Data.inviteId
-            });
+            }, { skipToast: true });
             if (response.data?.status) {
               statuses[notif.Data.inviteId] = response.data.status;
             }

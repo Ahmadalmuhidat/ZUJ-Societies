@@ -86,7 +86,13 @@ export default function SocietyDetail() {
 
       <div className={`min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <Timeline id={id} posts={posts} getPostsBySociety={getPostsBySociety} onPostDeleted={handlePostDeleted} />
+          <Timeline
+            id={id}
+            posts={posts}
+            getPostsBySociety={getPostsBySociety}
+            onPostDeleted={handlePostDeleted}
+            setShowModal={setShowModal}
+          />
         </div>
       </div>
 

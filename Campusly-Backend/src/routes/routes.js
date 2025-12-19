@@ -21,7 +21,6 @@ router.get('/users/profile', authMiddleware.checkUserLoggedIn, userController.ge
 router.put('/users/profile', authMiddleware.checkUserLoggedIn, userController.updateProfile);
 router.get('/users/profile/public', userController.getUserPublicProfile);
 router.get('/users/search', authMiddleware.checkUserLoggedIn, userController.searchUsers);
-// router.delete('/users/delete_user', auth_mdiddleware.checkUserLoggedIn, userController.deleteUser);
 router.get('/users/events', userController.getEventsAttendedByUser);
 router.get('/users/events/status', authMiddleware.checkUserLoggedIn, userController.getUserEventStatus);
 router.get('/users/posts', userController.getPostsByUserPublic);

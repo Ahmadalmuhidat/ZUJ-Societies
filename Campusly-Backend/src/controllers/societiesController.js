@@ -101,16 +101,16 @@ exports.inviteMemberToSociety = async (req, res) => {
     );
 
     const notification = {
-      type: 'invitation',
-      title: 'Society Invitation',
-      message: `You have been invited to join ${society.Name} society`,
-      data: {
+      Type: 'invitation',
+      Title: 'Society Invitation',
+      Message: `You have been invited to join ${society.Name} society`,
+      Data: {
         inviteId: invite.ID,
         societyId: SocietyID,
         inviterId: userID,
         societyName: society.Name
       },
-      time: new Date().toISOString()
+      CreatedAt: new Date().toISOString()
     };
 
     ServerSentEvents.sendToUser([InviteeID], notification);
@@ -176,22 +176,26 @@ exports.checkInvitationStatus = async (req, res) => {
   try {
     const { invitation_id } = req.body;
     const token = req.headers['authorization']?.split(' ')[1];
-    const userID = JsonWebToken.verifyToken(token)['id'];
+    const userID = JsonWebToken.verifyToken(token)?.id;
+
+    if (!invitation_id) {
+      return res.status(400).json({ error_message: 'Missing invitation_id.' });
+    }
 
     const society = await Society.findOne({ "Invites.ID": invitation_id });
-    if (!society) {
+    if (!society || !society.Invites) {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
 
-    const invitation = society.Invites.find(inv => inv.ID === invitation_id && inv.Invitee === userID);
+    const invitation = society.Invites.find(invite => invite.ID === invitation_id && invite.Invitee === userID);
     if (!invitation) {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
 
     res.status(200).json({ status: invitation.Status });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error_message: 'Failed to check invitation status.' });
+    console.error('Error in checkInvitationStatus:', error);
+    res.status(500).json({ error_message: 'Internal server error.' });
   }
 };
 

@@ -225,7 +225,7 @@ exports.getCommentsForPost = async (req, res) => {
 
 exports.reportPost = async (req, res) => {
   try {
-    const {post_id, message} = req.body;
+    const { post_id, message } = req.body;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
 

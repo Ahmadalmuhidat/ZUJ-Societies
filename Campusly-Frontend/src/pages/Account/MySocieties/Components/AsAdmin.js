@@ -11,13 +11,11 @@ export default function AsAdmin({ societies }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {societies
-          .filter(society => society.Role === 'admin')
-          .map(society => (
+        {societies.filter(society => society.Role === 'admin' || society.Role === 'creator').map(society => (
             <div key={society.ID} className="relative">
               <SocietyCard {...society} />
-              <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                Manager
+              <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg backdrop-blur-sm">
+                {society.Role === 'creator' ? 'Owner' : 'Manager'}
               </div>
             </div>
           ))}

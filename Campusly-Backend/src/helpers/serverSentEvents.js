@@ -68,10 +68,11 @@ class SSEManager {
         if (client && !client.res.destroyed) {
           client.res.write(
             `data: ${JSON.stringify({
-              type: notification.type,
-              title: notification.title,
-              message: notification.message,
-              data: notification.data || {}
+              Type: notification.Type,
+              Title: notification.Title,
+              Message: notification.Message,
+              Data: notification.Data || {},
+              CreatedAt: notification.CreatedAt || new Date().toISOString()
             })}\n\n`
           );
         }

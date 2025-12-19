@@ -6,9 +6,9 @@ import EventCard from '../../../Events/Components/EventCard';
 import AxiosClient from '../../../../config/axios';
 import { useSocietyMembership } from '../../../../context/MembershipContext';
 
-export default function Timeline({ id, posts, getPostsBySociety, onPostDeleted }) {
+export default function Timeline({ id, posts, getPostsBySociety, onPostDeleted, setShowModal }) {
   const [events, setEvents] = useState([]);
-  const { isMember, isAdmin } = useSocietyMembership(id);
+  const { isMember, isAdmin, canPost } = useSocietyMembership(id);
 
   const getEventsBySociety = async () => {
     try {
@@ -62,12 +62,17 @@ export default function Timeline({ id, posts, getPostsBySociety, onPostDeleted }
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
               <p className="text-gray-500 mb-4">Be the first to share something with the society!</p>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Create Post
-              </button>
+              {canPost() && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Create Post
+                </button>
+              )}
             </div>
           )}
         </div>

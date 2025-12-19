@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AxiosClient from '../../../config/axios';
 import AsAdmin from './Components/AsAdmin';
-import AsMemeber from './Components/AsMember';
+import AsMember from './Components/AsMember';
 import QuickStats from './Components/QuickStats';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -33,7 +33,7 @@ export default function MySocieties() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const adminSocieties = societies.filter(soc => soc.Role === 'admin');
+  const adminSocieties = societies.filter(soc => soc.Role === 'admin' || soc.Role === 'creator');
 
   return (
     <main className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
@@ -64,7 +64,7 @@ export default function MySocieties() {
               </p>
             </div>
             {adminSocieties.length > 0 && <AsAdmin societies={societies} />}
-            <AsMemeber societies={societies} />
+            <AsMember societies={societies} />
             <QuickStats societies={societies} />
           </>
         )}

@@ -48,24 +48,32 @@ export const useNotifications = () => {
         } else if (data.type === 'heartbeat') {
           console.log('SSE heartbeat received');
         } else {
+          const notificationData = {
+            id: data.ID || data.id,
+            type: data.Type || data.type,
+            title: data.Title || data.title,
+            message: data.Message || data.message,
+            data: data.Data || data.data || {},
+            time: data.CreatedAt || data.time || new Date().toISOString(),
+            Read: false
+          };
+
           setNotifications(prev => {
-            const exists = prev.some(notification => notification.id === data.id);
-            if (exists) {
-              return prev;
-            }
-            return [data, ...prev];
+            const exists = prev.some(n => (n.ID || n.id) === notificationData.id);
+            if (exists) return prev;
+            return [notificationData, ...prev];
           });
 
           setUnreadCount(prev => prev + 1);
 
           if (Notification.permission === 'granted') {
-            new Notification(data.title, {
-              body: data.message,
+            new Notification(notificationData.title, {
+              body: notificationData.message,
               icon: '/favicon.ico'
             });
           }
 
-          toast.info(`${data.title}: ${data.message}`, {
+          toast.info(`${notificationData.title}: ${notificationData.message}`, {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,

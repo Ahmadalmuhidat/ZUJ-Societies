@@ -150,6 +150,7 @@ The included Jenkinsfile automates:
 The React app is served via Nginx, configured for optimal caching and routing for SPAs.
 
 ## Contributing
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
@@ -163,4 +164,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 **Ahmad Almuhidat**
+
 - Email: ahmad.almuhidat@gmail.com

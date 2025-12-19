@@ -1,6 +1,6 @@
 import SocietyCard from "../../../Societies/Components/SocietyCard";
 
-export default function AsMemeber({ societies }) {
+export default function AsMember({ societies }) {
   return (
     <div className="mb-12">
       <h2 className="text-3xl font-bold text-gray-900 mb-8">My Memberships</h2>
