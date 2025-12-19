@@ -11,14 +11,7 @@ exports.generateToken = (user) => {
     throw new Error("Invalid user object provided.");
   }
 
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    SECRET,
-    { expiresIn: '30d' }
-  );
+  return jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '30d' });
 }
 
 exports.verifyToken = (token) => {

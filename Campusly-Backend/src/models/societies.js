@@ -2,18 +2,27 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
 const memberSchema = new mongoose.Schema({
-  ID: { type: String, default: uuidv4 },
+  ID: {
+    type: String,
+    default: uuidv4
+  },
   User: String,
   Role: {
     type: String,
     enum: ['admin', 'moderator', 'member'],
     default: 'member'
   },
-  JoinedAt: { type: Date, default: Date.now }
+  JoinedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const inviteSchema = new mongoose.Schema({
-  ID: { type: String, default: uuidv4 },
+  ID: {
+    type: String,
+    default: uuidv4
+  },
   Inviter: String,
   Invitee: String,
   Status: {
@@ -21,18 +30,27 @@ const inviteSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'declined'],
     default: 'pending'
   },
-  CreatedAt: { type: Date, default: Date.now }
+  CreatedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const joinRequestSchema = new mongoose.Schema({
-  ID: { type: String, default: uuidv4 },
+  ID: {
+    type: String,
+    default: uuidv4
+  },
   User: String,
   Status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   },
-  RequestedAt: { type: Date, default: Date.now }
+  RequestedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const societySchema = new mongoose.Schema({
@@ -47,7 +65,10 @@ const societySchema = new mongoose.Schema({
   User: String,
   Category: String,
   Image: String,
-  CreatedAt: { type: Date, default: Date.now },
+  CreatedAt: {
+    type: Date,
+    default: Date.now
+  },
 
   Privacy: {
     visibility: {
@@ -55,9 +76,18 @@ const societySchema = new mongoose.Schema({
       enum: ['public', 'private'],
       default: 'public'
     },
-    joinApproval: { type: Boolean, default: true },
-    memberListVisible: { type: Boolean, default: true }, // Hidden from UI, enforced in backend
-    eventsVisible: { type: Boolean, default: true }
+    joinApproval: {
+      type: Boolean,
+      default: true
+    },
+    memberListVisible: {
+      type: Boolean,
+      default: true
+    },
+    eventsVisible: {
+      type: Boolean,
+      default: true
+    }
   },
 
   Permissions: {
@@ -79,13 +109,28 @@ const societySchema = new mongoose.Schema({
   },
 
   Notifications: {
-    newMemberNotifications: { type: Boolean, default: true },
-    emailNotifications: { type: Boolean, default: true }
+    newMemberNotifications: {
+      type: Boolean,
+      default: true
+    },
+    emailNotifications: {
+      type: Boolean,
+      default: true
+    }
   },
 
-  Members: { type: [memberSchema], default: [] },
-  Invites: { type: [inviteSchema], default: [] },
-  JoinRequests: { type: [joinRequestSchema], default: [] }
+  Members: {
+    type: [memberSchema],
+    default: []
+  },
+  Invites: {
+    type: [inviteSchema],
+    default: []
+  },
+  JoinRequests: {
+    type: [joinRequestSchema],
+    default: []
+  }
 });
 
 module.exports = mongoose.model('Society', societySchema);

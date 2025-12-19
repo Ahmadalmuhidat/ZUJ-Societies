@@ -16,7 +16,7 @@ export default function EventStats({ events }) {
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Upcoming Events</p>
             <p className="text-xl font-bold text-gray-900">
-              {events.filter(e => getEventStatus(e) === 'upcoming').length}
+              {events.filter(event => getEventStatus(event) === 'upcoming').length}
             </p>
           </div>
         </div>

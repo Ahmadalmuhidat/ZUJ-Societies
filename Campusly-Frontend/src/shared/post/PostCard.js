@@ -77,7 +77,7 @@ export default function PostCard({ post, onPostDeleted }) {
       }
     } catch (error) {
       console.error('Failed to add comment:', error);
-      setComments((prev) => prev.filter((c) => c.id !== tempId));
+      setComments((prev) => prev.filter((comment) => comment.id !== tempId));
     }
   };
 

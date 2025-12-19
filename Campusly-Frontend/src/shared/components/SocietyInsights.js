@@ -73,7 +73,7 @@ export default function SocietyInsights({ societies = [] }) {
 
     
     const largest = [...societies]
-      .filter(s => s.Member_Count > 50)
+      .filter(society => society.Member_Count > 50)
       .sort((a, b) => (b.Member_Count || 0) - (a.Member_Count || 0))
       .slice(0, 5);
 

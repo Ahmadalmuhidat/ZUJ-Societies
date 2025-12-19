@@ -67,7 +67,7 @@ export default function NewSocietyForm() {
     setFormData(prev => ({
       ...prev,
       tags: prev.tags.includes(tag)
-        ? prev.tags.filter(t => t !== tag)
+        ? prev.tags.filter(tag => tag !== tag)
         : [...prev.tags, tag]
     }));
   };
@@ -124,7 +124,6 @@ export default function NewSocietyForm() {
 
   const createNewSociety = async (e) => {
     e.preventDefault();
-
 
     if (currentStep !== 3) {
       return;

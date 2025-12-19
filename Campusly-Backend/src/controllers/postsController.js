@@ -23,7 +23,6 @@ exports.getAllPosts = async (req, res) => {
       const postUser = users.find(user => user.ID === post.User);
       const postSociety = userSocieties.find(society => society.ID === post.Society);
       const isLiked = post.Likes?.some(like => like.User === userId) || false;
-
       const likeCount = post.LikesCount || 0;
 
       return {
@@ -162,18 +161,22 @@ exports.likePost = async (req, res) => {
     const existingLike = post.Likes?.find(like => like.User === userId);
     if (existingLike) return res.status(400).json({ error_message: "User already liked this post." });
 
-    const { v4: uuidv4 } = require('uuid');
     const newLike = {
-      ID: uuidv4(),
       User: userId,
       CreatedAt: new Date()
     };
 
     await Post.updateOne(
-      { ID: post_id },
       {
-        $push: { Likes: newLike },
-        $inc: { LikesCount: 1 }
+        ID: post_id
+      },
+      {
+        $push: {
+          Likes: newLike
+        },
+        $inc: {
+          LikesCount: 1
+        }
       }
     );
 

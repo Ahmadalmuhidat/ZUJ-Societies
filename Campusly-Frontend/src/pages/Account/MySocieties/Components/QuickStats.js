@@ -11,7 +11,7 @@ export default function QuickStats({ societies }) {
         </div>
         <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl hover:shadow-lg transition-all duration-300">
           <div className="text-4xl font-bold text-green-600 mb-3">
-            {societies.filter(soc => soc.Role === 'admin' || soc.Role === 'creator').length}
+            {societies.filter(society => society.Role === 'admin' || society.Role === 'creator').length}
           </div>
           <div className="text-gray-700 font-medium">Managed Societies</div>
         </div>

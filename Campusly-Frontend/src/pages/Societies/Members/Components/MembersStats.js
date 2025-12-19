@@ -2,8 +2,8 @@ import React from "react";
 
 export default function MembersStats({ members }) {
   const totalMembers = members.length;
-  const adminsCount = members.filter((m) => m.Role === "admin").length;
-  const moderatorsCount = members.filter((m) => m.Role === "moderator").length;
+  const adminsCount = members.filter((member) => member.Role === "admin").length;
+  const moderatorsCount = members.filter((member) => member.Role === "moderator").length;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

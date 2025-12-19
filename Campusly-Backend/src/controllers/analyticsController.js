@@ -116,18 +116,24 @@ exports.getActivityFeed = async (req, res) => {
     const activities = [];
 
     const allSocieties = await Society.find({}).select("ID Members").lean();
-    const userSocieties = allSocieties
-      .filter(s => s.Members?.some(m => m.User === userId))
-      .map(s => s.ID);
+    const userSocieties = allSocieties.filter(society => society.Members?.some(member => member.User === userId)).map(society => society.ID);
 
     const recentPosts = await Post.aggregate([
       {
         $match: {
-          Society: { $in: userSocieties }
+          Society: {
+            $in: userSocieties
+          }
         }
       },
-      { $sort: { CreatedAt: -1 } },
-      { $limit: 5 },
+      {
+        $sort: {
+          CreatedAt: -1
+        }
+      },
+      {
+        $limit: 5
+      },
       {
         $lookup: {
           from: "users",
@@ -136,7 +142,12 @@ exports.getActivityFeed = async (req, res) => {
           as: "UserData"
         }
       },
-      { $unwind: { path: "$UserData", preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: {
+          path: "$UserData",
+          preserveNullAndEmptyArrays: true
+        }
+      },
       {
         $lookup: {
           from: "societies",
@@ -145,7 +156,12 @@ exports.getActivityFeed = async (req, res) => {
           as: "SocietyData"
         }
       },
-      { $unwind: { path: "$SocietyData", preserveNullAndEmptyArrays: true } }
+      {
+        $unwind: {
+          path: "$SocietyData",
+          preserveNullAndEmptyArrays: true
+        }
+      }
     ]);
 
     recentPosts.forEach(post => {
@@ -169,11 +185,19 @@ exports.getActivityFeed = async (req, res) => {
     const recentEvents = await Event.aggregate([
       {
         $match: {
-          Society: { $in: userSocieties }
+          Society: {
+            $in: userSocieties
+          }
         }
       },
-      { $sort: { CreatedAt: -1 } },
-      { $limit: 3 },
+      {
+        $sort: {
+          CreatedAt: -1
+        }
+      },
+      {
+        $limit: 3
+      },
       {
         $lookup: {
           from: "users",
@@ -182,7 +206,12 @@ exports.getActivityFeed = async (req, res) => {
           as: "UserData"
         }
       },
-      { $unwind: { path: "$UserData", preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: {
+          path: "$UserData",
+          preserveNullAndEmptyArrays: true
+        }
+      },
       {
         $lookup: {
           from: "societies",
@@ -215,11 +244,19 @@ exports.getActivityFeed = async (req, res) => {
     const recentSocieties = await Society.aggregate([
       {
         $match: {
-          Society: { $in: userSocieties }
+          Society: {
+            $in: userSocieties
+          }
         }
       },
-      { $sort: { CreatedAt: -1 } },
-      { $limit: 2 },
+      {
+        $sort: {
+          CreatedAt: -1
+        }
+      },
+      {
+        $limit: 2
+      },
       {
         $lookup: {
           from: "users",
@@ -228,7 +265,12 @@ exports.getActivityFeed = async (req, res) => {
           as: "UserData"
         }
       },
-      { $unwind: { path: "$UserData", preserveNullAndEmptyArrays: true } }
+      {
+        $unwind: {
+          path: "$UserData",
+          preserveNullAndEmptyArrays: true
+        }
+      }
     ]);
 
     recentSocieties.forEach(society => {
@@ -250,10 +292,7 @@ exports.getActivityFeed = async (req, res) => {
 
     activities.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-    res.status(200).json({
-      data: activities.slice(0, limit)
-    });
-
+    res.status(200).json({ data: activities.slice(0, limit) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to fetch activity feed." });

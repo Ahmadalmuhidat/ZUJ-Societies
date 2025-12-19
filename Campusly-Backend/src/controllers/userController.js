@@ -15,8 +15,18 @@ exports.searchUsers = async (req, res) => {
     const users = await User.find(
       {
         $or: [
-          { Name: { $regex: query, $options: 'i' } },
-          { Email: { $regex: query, $options: 'i' } }
+          {
+            Name: {
+              $regex: query,
+              $options: 'i'
+            }
+          },
+          {
+            Email: {
+              $regex: query,
+              $options: 'i'
+            }
+          }
         ]
       },
       'ID Name Email Photo'
@@ -34,7 +44,10 @@ exports.getUserInformation = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
     const user = await User.findOne({ ID: userId }, 'ID Name Email');
-    if (!user) return res.status(404).json({ error_message: "User not found." });
+    if (!user) {
+      return res.status(404).json({ error_message: "User not found." });
+    }
+
     res.status(200).json({ data: user });
   } catch (err) {
     console.error(err);
@@ -123,7 +136,6 @@ exports.getUserPublicProfile = async (req, res) => {
       return res.status(404).json({ error_message: 'User not found' });
     }
 
-    // Check profile visibility
     const profileVisibility = user.Privacy?.profileVisibility || 'public';
 
     if (!isOwnProfile && profileVisibility === 'private') {
@@ -131,21 +143,15 @@ exports.getUserPublicProfile = async (req, res) => {
     }
 
     if (!isOwnProfile && profileVisibility === 'members') {
-      // Check if viewer is a member of any same society
+
       if (!viewerId) {
         return res.status(403).json({ error_message: 'This profile is only visible to society members' });
       }
 
-      const viewerSocieties = await Society.find({
-        'Members.User': viewerId
-      }).select('ID').lean();
-
-      const userSocieties = await Society.find({
-        'Members.User': userId
-      }).select('ID').lean();
-
-      const viewerSocietyIds = viewerSocieties.map(s => s.ID);
-      const userSocietyIds = userSocieties.map(s => s.ID);
+      const viewerSocieties = await Society.find({ 'Members.User': viewerId }).select('ID').lean();
+      const userSocieties = await Society.find({ 'Members.User': userId }).select('ID').lean();
+      const viewerSocietyIds = viewerSocieties.map(society => society.ID);
+      const userSocietyIds = userSocieties.map(society => society.ID);
       const hasCommonSociety = viewerSocietyIds.some(id => userSocietyIds.includes(id));
 
       if (!hasCommonSociety) {
@@ -162,7 +168,6 @@ exports.getUserPublicProfile = async (req, res) => {
       Society.countDocuments({ User: userId })
     ]);
 
-    // Build response based on privacy settings
     const showEmail = isOwnProfile || (user.Privacy?.showEmail ?? false);
     const showPhone = isOwnProfile || (user.Privacy?.showPhone ?? false);
 
@@ -293,7 +298,7 @@ exports.getUserEventStatus = async (req, res) => {
     }
 
     const event = await Event.findOne({ ID: event_id });
-    const attendance = event?.Attendance.find(a => a.User === userId);
+    const attendance = event?.Attendance.find(attendance => attendance.User === userId);
 
     res.status(200).json({
       data: {
@@ -312,8 +317,8 @@ exports.getSocietiesByUser = async (req, res) => {
     const userId = JsonWebToken.verifyToken(token)['id'];
     const createdSocieties = await Society.find({ User: userId });
     const allSocieties = await Society.find({});
-    const memberSocieties = allSocieties.filter(s =>
-      s.Members?.some(m => m.User === userId && s.User !== userId)
+    const memberSocieties = allSocieties.filter(society =>
+      society.Members?.some(m => m.User === userId && society.User !== userId)
     );
 
     const societiesWithCounts = [...createdSocieties, ...memberSocieties].map(society => ({
@@ -322,10 +327,10 @@ exports.getSocietiesByUser = async (req, res) => {
     }));
 
     const combined = [
-      ...societiesWithCounts.filter(s => createdSocieties.some(cs => cs.ID === s.ID)).map(s => ({ ...s, Role: 'creator' })),
-      ...societiesWithCounts.filter(s => memberSocieties.some(ms => ms.ID === s.ID)).map(s => {
-        const membership = s.Members.find(m => m.User === userId);
-        return { ...s, Role: membership?.Role || null };
+      ...societiesWithCounts.filter(society => createdSocieties.some(created_societies => created_societies.ID === society.ID)).map(society => ({ ...society, Role: 'creator' })),
+      ...societiesWithCounts.filter(society => memberSocieties.some(member_societies => member_societies.ID === society.ID)).map(society => {
+        const membership = society.Members.find(member => member.User === userId);
+        return { ...society, Role: membership?.Role || null };
       })
     ];
 

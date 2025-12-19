@@ -30,6 +30,7 @@ exports.markNotificationAsRead = async (req, res) => {
     const userId = JsonWebToken.verifyToken(token)['id'];
 
     await Notification.updateOne({ ID: notificationId, User: userId }, { Read: true });
+
     res.status(200).json({ data: true });
   } catch (err) {
     console.error(err);

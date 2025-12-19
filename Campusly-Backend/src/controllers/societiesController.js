@@ -55,7 +55,7 @@ exports.inviteMemberToSociety = async (req, res) => {
       return res.status(404).json({ error_message: 'Society not found.' });
     }
 
-    const inviterMember = society.Members.find(m => m.User === userID);
+    const inviterMember = society.Members.find(member => member.User === userID);
     if (!inviterMember) {
       return res.status(403).json({ error_message: 'You are not a member of this society.' });
     }
@@ -77,17 +77,13 @@ exports.inviteMemberToSociety = async (req, res) => {
       return res.status(400).json({ error_message: 'User is already a member of this society.' });
     }
 
-    const existingInvite = society.Invites.find(inv =>
-      inv.Invitee === InviteeID && inv.Status === 'pending'
-    );
+    const existingInvite = society.Invites.find(invite => invite.Invitee === InviteeID && invite.Status === 'pending');
 
     if (existingInvite) {
       return res.status(400).json({ error_message: 'User has already been invited.' });
     }
 
-    const { v4: uuidv4 } = require('uuid');
     const invite = {
-      ID: uuidv4(),
       Society: SocietyID,
       Inviter: userID,
       Invitee: InviteeID,
@@ -132,7 +128,7 @@ exports.respondToInvitation = async (req, res) => {
       return res.status(404).json({ error_message: 'Society not found.' });
     }
 
-    const invitation = society.Invites.find(inv => inv.ID === invitation_id && inv.Invitee === userID);
+    const invitation = society.Invites.find(invite => invite.ID === invitation_id && invite.Invitee === userID);
     if (!invitation) {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
@@ -141,27 +137,38 @@ exports.respondToInvitation = async (req, res) => {
     }
 
     if (response === 'accept') {
-      const { v4: uuidv4 } = require('uuid');
       const newMember = {
-        ID: uuidv4(),
         User: userID,
         Role: 'member',
         JoinedAt: new Date()
       };
 
       await Society.updateOne(
-        { "Invites.ID": invitation_id },
         {
-          $push: { Members: newMember },
-          $set: { "Invites.$.Status": 'accepted' }
+          "Invites.ID": invitation_id
+        },
+        {
+          $push: {
+            Members: newMember
+          },
+          $set: {
+            "Invites.$.Status": 'accepted'
+          }
         }
       );
       res.status(200).json({ data: invitation });
     } else if (response === 'decline') {
       await Society.updateOne(
-        { "Invites.ID": invitation_id },
-        { $set: { "Invites.$.Status": 'declined' } }
+        {
+          "Invites.ID": invitation_id
+        },
+        {
+          $set: {
+            "Invites.$.Status": 'declined'
+          }
+        }
       );
+
       res.status(200).json({ data: invitation });
     } else {
       res.status(400).json({ error_message: 'Invalid response. Must be "accept" or "decline".' });
@@ -210,7 +217,7 @@ exports.getSentInvitations = async (req, res) => {
       return res.status(404).json({ error_message: 'Society not found.' });
     }
 
-    const member = society.Members.find(m => m.User === userID);
+    const member = society.Members.find(member => member.User === userID);
     if (!member || !['admin', 'moderator'].includes(member.Role)) {
       return res.status(403).json({ error_message: 'You do not have permission to view invitations.' });
     }
@@ -252,19 +259,30 @@ exports.cancelInvitation = async (req, res) => {
       return res.status(404).json({ error_message: 'Invitation not found.' });
     }
 
-    const member = society.Members.find(m => m.User === userID);
+    const member = society.Members.find(member => member.User === userID);
     if (!member || !['admin', 'moderator'].includes(member.Role)) {
       return res.status(403).json({ error_message: 'You do not have permission to cancel this invitation.' });
     }
 
     await Society.updateOne(
-      { "Invites.ID": invitation_id },
-      { $pull: { Invites: { ID: invitation_id } } }
+      {
+        "Invites.ID": invitation_id
+      },
+      {
+        $pull: {
+          Invites: {
+            ID: invitation_id
+          }
+        }
+      }
     );
     await Notifications.deleteOne({
       type: 'invitation',
-      Data: { inviteId: invitation_id }
+      Data: {
+        inviteId: invitation_id
+      }
     });
+
     res.status(200).json({ data: true });
   } catch (error) {
     console.error(error);
@@ -317,7 +335,7 @@ exports.createSociety = async (req, res) => {
       Image: image,
 
       Privacy: privacy || {
-        visibility: 'public',
+        visibility: visibility,
         joinApproval: true,
         memberListVisible: true,
         eventsVisible: true
@@ -337,21 +355,24 @@ exports.createSociety = async (req, res) => {
 
     await newSociety.save();
 
-    const { v4: uuidv4 } = require('uuid');
     const newMember = {
-      ID: uuidv4(),
       User: userId,
       Role: "admin",
       JoinedAt: new Date()
     };
 
     await Society.updateOne(
-      { ID: newSociety.ID },
-      { $push: { Members: newMember } }
+      {
+        ID: newSociety.ID
+      },
+      {
+        $push: {
+          Members: newMember
+        }
+      }
     );
 
     res.status(201).json({ data: newSociety.ID });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to create society." });
@@ -377,8 +398,6 @@ exports.deleteSociety = async (req, res) => {
       return res.status(403).json({ error_message: "You don't have permission to delete this society." });
     }
 
-    // CASCADE DELETE
-    // 1. Get all post and event IDs to clean up reports
     const [posts, events] = await Promise.all([
       Post.find({ Society: society_id }).select('ID'),
       Event.find({ Society: society_id }).select('ID')
@@ -388,13 +407,9 @@ exports.deleteSociety = async (req, res) => {
     const eventIds = events.map(e => e.ID);
     const allReferenceIds = [...postIds, ...eventIds];
 
-    // 2. Perform deletions in parallel
     await Promise.all([
-      // Delete Posts
       Post.deleteMany({ Society: society_id }),
-      // Delete Events
       Event.deleteMany({ Society: society_id }),
-      // Delete Notifications related to this society, its posts, or its events
       Notifications.deleteMany({
         $or: [
           { "Data.societyId": society_id },
@@ -402,9 +417,7 @@ exports.deleteSociety = async (req, res) => {
           { "Data.eventId": { $in: eventIds } }
         ]
       }),
-      // Delete Reports related to this society's content
       Report.deleteMany({ ReferenceID: { $in: allReferenceIds } }),
-      // Delete the Society itself
       Society.deleteOne({ ID: society_id })
     ]);
 
@@ -439,13 +452,10 @@ exports.joinRequest = async (req, res) => {
       return res.status(400).json({ error_message: "You have already requested to join this society." });
     }
 
-    const { v4: uuidv4 } = require('uuid');
-
     const joinApproval = society.Privacy?.joinApproval ?? true;
 
     if (!joinApproval) {
       const newMember = {
-        ID: uuidv4(),
         User: userId,
         Role: "member",
         JoinedAt: new Date()
@@ -465,24 +475,27 @@ exports.joinRequest = async (req, res) => {
     }
 
     const newRequest = {
-      ID: uuidv4(),
       User: userId,
       Status: "pending",
       RequestedAt: new Date()
     };
 
     await Society.updateOne(
-      { ID: society_id },
-      { $push: { JoinRequests: newRequest } }
+      {
+        ID: society_id
+      },
+      {
+        $push: {
+          JoinRequests: newRequest
+        }
+      }
     );
 
     try {
       const society = await Society.findOne({ ID: society_id });
       const user = await User.findOne({ ID: userId }).select('Name Photo');
 
-      const adminUserIds = society.Members
-        .filter(m => ['admin', 'creator'].includes(m.Role))
-        .map(m => m.User);
+      const adminUserIds = society.Members.filter(member => ['admin', 'creator'].includes(member.Role)).map(m => m.User);
 
       if (adminUserIds.length > 0) {
         const notification = {
@@ -505,7 +518,6 @@ exports.joinRequest = async (req, res) => {
     }
 
     res.status(201).json({ data: newRequest });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to join society." });
@@ -547,14 +559,12 @@ exports.approveJoinRequest = async (req, res) => {
       return res.status(404).json({ error_message: "Request not found." });
     }
 
-    const request = society.JoinRequests.find(r => r.ID === request_id);
+    const request = society.JoinRequests.find(request => request.ID === request_id);
     if (!request) {
       return res.status(404).json({ error_message: "Request not found." });
     }
 
-    const { v4: uuidv4 } = require('uuid');
     const newMember = {
-      ID: uuidv4(),
       User: request.User,
       Role: "member",
       JoinedAt: new Date()
@@ -563,8 +573,12 @@ exports.approveJoinRequest = async (req, res) => {
     await Society.updateOne(
       { "JoinRequests.ID": request_id },
       {
-        $set: { "JoinRequests.$.Status": 'approved' },
-        $push: { Members: newMember }
+        $set: {
+          "JoinRequests.$.Status": 'approved'
+        },
+        $push: {
+          Members: newMember
+        }
       }
     );
 
@@ -604,7 +618,7 @@ exports.rejectJoinRequest = async (req, res) => {
       return res.status(404).json({ error_message: "Request not found." });
     }
 
-    const request = society.JoinRequests.find(r => r.ID === request_id);
+    const request = society.JoinRequests.find(request => request.ID === request_id);
     if (!request) {
       return res.status(404).json({ error_message: "Request not found." });
     }
@@ -644,6 +658,7 @@ exports.rejectJoinRequest = async (req, res) => {
 exports.getAllJoinRequests = async (req, res) => {
   try {
     const { society_id } = req.query;
+
     const society = await Society.findOne({ ID: society_id });
     if (!society) {
       return res.status(404).json({ error_message: "Society not found." });
@@ -665,7 +680,7 @@ exports.getAllJoinRequests = async (req, res) => {
       };
     });
 
-    res.status(200).json({ data });
+    res.status(200).json({ data: data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to get join requests." });
@@ -704,7 +719,8 @@ exports.getAllMembers = async (req, res) => {
         isOwner: society.User === member.User
       };
     });
-    res.status(200).json({ data });
+
+    res.status(200).json({ data: data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to get members." });
@@ -723,14 +739,14 @@ exports.removeMember = async (req, res) => {
     }
 
     const isOwner = society.User === userId;
-    const isAdmin = society.Members?.some(m => m.User === userId && m.Role === 'admin');
+    const isAdmin = society.Members?.some(member => member.User === userId && member.Role === 'admin');
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ error_message: "You don't have permission to remove the member." });
     }
 
     if (!isOwner) {
-      const targetMember = society.Members.find(m => m.User === user_id);
+      const targetMember = society.Members.find(member => member.User === user_id);
       if (targetMember?.Role === 'admin') {
         return res.status(403).json({ error_message: "Admins cannot remove other admins." });
       }
@@ -741,8 +757,16 @@ exports.removeMember = async (req, res) => {
     }
 
     await Society.updateOne(
-      { ID: society_id },
-      { $pull: { Members: { User: user_id } } }
+      {
+        ID: society_id
+      },
+      {
+        $pull: {
+          Members: {
+            User: user_id
+          }
+        }
+      }
     );
 
     res.status(204).json({ data: true });
@@ -757,12 +781,13 @@ exports.checkMembership = async (req, res) => {
     const { society_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
+
     const society = await Society.findOne({ ID: society_id });
     if (!society) {
       return res.status(404).json({ error_message: "Society not found." });
     }
 
-    const isMember = society.Members?.some(m => m.User === userId);
+    const isMember = society.Members?.some(member => member.User === userId);
     res.status(200).json({ data: !!isMember });
   } catch (err) {
     console.error(err);
@@ -775,8 +800,8 @@ exports.checkAdmin = async (req, res) => {
     const { society_id } = req.query;
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = JsonWebToken.verifyToken(token)['id'];
-    const society = await Society.findOne({ ID: society_id });
 
+    const society = await Society.findOne({ ID: society_id });
     if (!society) {
       return res.status(404).json({ error_message: "Society not found." });
     }
@@ -792,7 +817,16 @@ exports.checkAdmin = async (req, res) => {
 
 exports.updateInformation = async (req, res) => {
   try {
-    const { name, description, category, permissions, notifications, society_id, privacy } = req.body;
+    const {
+      name,
+      description,
+      category,
+      permissions,
+      notifications,
+      society_id,
+      privacy
+    } = req.body;
+
     const update = {
       Name: name,
       Description: description,
@@ -811,8 +845,8 @@ exports.updateInformation = async (req, res) => {
     };
 
     const result = await Society.updateOne({ ID: society_id }, update);
-    res.status(204).json({ data: result });
 
+    res.status(204).json({ data: result });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to update society info." });
@@ -831,32 +865,34 @@ exports.updateMemberRole = async (req, res) => {
     }
 
     const isOwner = society.User === userId;
-    const requestorMember = society.Members.find(m => m.User === userId);
+    const requestorMember = society.Members.find(member => member.User === userId);
     const isAdmin = requestorMember?.Role === 'admin';
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ error_message: "You don't have permission to update member roles." });
     }
 
-    // If not owner, check permissions
     if (!isOwner) {
-      // Admins cannot change the owner's role (though owner isn't technically in Members with 'owner' role usually, but let's be safe)
       if (member === society.User) {
         return res.status(403).json({ error_message: "You cannot change the owner's role." });
       }
 
-      // Admins cannot demote other admins? Or maybe they can? 
-      // User said: "if user is owner he change the rile for anyone, other that it dpend on his role"
-      // Let's assume admins can manage moderators and members.
-      const targetMember = society.Members.find(m => m.User === member);
+      const targetMember = society.Members.find(member => member.User === member);
       if (targetMember?.Role === 'admin') {
         return res.status(403).json({ error_message: "Admins cannot change other admins' roles." });
       }
     }
 
     const result = await Society.updateOne(
-      { ID: society_id, "Members.User": member },
-      { $set: { "Members.$.Role": role } }
+      {
+        ID: society_id,
+        "Members.User": member
+      },
+      {
+        $set: {
+          "Members.$.Role": role
+        }
+      }
     );
 
     if (result.matchedCount === 0) {
@@ -889,27 +925,36 @@ exports.transferOwnership = async (req, res) => {
       return res.status(403).json({ error_message: "Only the owner can transfer ownership." });
     }
 
-    const newOwnerMember = society.Members.find(m => m.User === new_owner_id);
+    const newOwnerMember = society.Members.find(member => member.User === new_owner_id);
     if (!newOwnerMember) {
       return res.status(400).json({ error_message: "New owner must be a member of the society." });
     }
 
-    // Update Society Owner
     await Society.updateOne(
-      { ID: society_id },
-      { $set: { User: new_owner_id } }
+      {
+        ID: society_id
+      },
+      {
+        $set: {
+          User: new_owner_id
+        }
+      }
     );
 
-    // Update Roles: ensuring new owner is admin, old owner remains admin (or whatever they were, usually admin)
-    // Actually, let's explicitly set new owner to 'admin' if they aren't already.
     if (newOwnerMember.Role !== 'admin') {
       await Society.updateOne(
-        { ID: society_id, "Members.User": new_owner_id },
-        { $set: { "Members.$.Role": 'admin' } }
+        {
+          ID: society_id,
+          "Members.User": new_owner_id
+        },
+        {
+          $set: {
+            "Members.$.Role": 'admin'
+          }
+        }
       );
     }
 
-    // Helper to send notification
     try {
       const notification = {
         type: 'ownership_transferred',
@@ -959,8 +1004,16 @@ exports.leaveSociety = async (req, res) => {
     }
 
     await Society.updateOne(
-      { ID: society_id },
-      { $pull: { Members: { User: userID } } }
+      {
+        ID: society_id
+      },
+      {
+        $pull: {
+          Members: {
+            User: userID
+          }
+        }
+      }
     );
 
     res.status(200).json({ message: "Successfully left the society." });
@@ -985,7 +1038,7 @@ exports.getEventsBySociety = async (req, res) => {
     }
 
     const eventsVisible = society.Privacy?.eventsVisible ?? true;
-    const isMember = userId && society.Members?.some(m => m.User === userId);
+    const isMember = userId && society.Members?.some(member => member.User === userId);
 
     if (!eventsVisible && !isMember) {
       return res.status(403).json({ error_message: "Events are only visible to society members." });
@@ -994,17 +1047,17 @@ exports.getEventsBySociety = async (req, res) => {
     const events = await Event.find(
       {
         Society: society_id,
-        Date: { $gte: today }
+        Date: {
+          $gte: today
+        }
       }
     ).lean();
 
     const userIds = events.map(e => e.User);
-    const users = await User.find({ ID: { $in: userIds } })
-      .select("ID Name")
-      .lean();
+    const users = await User.find({ ID: { $in: userIds } }).select("ID Name").lean();
 
     const result = events.map(event => {
-      const organizer = users.find(u => u.ID === event.User);
+      const organizer = users.find(user => user.ID === event.User);
       return {
         ...event,
         Organizer: organizer?.Name || null
@@ -1012,7 +1065,6 @@ exports.getEventsBySociety = async (req, res) => {
     });
 
     res.status(200).json({ data: result });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error_message: "Failed to get Events for this society." });
@@ -1034,7 +1086,7 @@ exports.getPostsBySociety = async (req, res) => {
     const users = await User.find({ ID: { $in: userIds } }).select("ID Name Photo").lean();
 
     const postsWithDetails = posts.map(post => {
-      const postUser = users.find(u => u.ID === post.User);
+      const postUser = users.find(user => user.ID === post.User);
       const likeCount = post.LikesCount || 0;
       const isLiked = post.Likes?.some(like => like.User === userId) ? 1 : 0;
 

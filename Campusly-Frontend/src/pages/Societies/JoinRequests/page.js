@@ -29,8 +29,8 @@ export default function SocietyJoinRequests() {
     }
   };
 
-  const filteredRequests = requests.filter(req =>
-    filter === 'all' || req.Status === filter
+  const filteredRequests = requests.filter(request =>
+    filter === 'all' || request.Status === filter
   );
 
   const formatDate = (dateString) => {

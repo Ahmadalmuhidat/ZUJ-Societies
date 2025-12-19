@@ -13,7 +13,7 @@ export default function StatsCards({ requests }) {
           </div>
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Pending Requests</p>
-            <p className="text-xl font-bold text-gray-900">{requests.filter(r => r.Status === 'pending').length}</p>
+            <p className="text-xl font-bold text-gray-900">{requests.filter(request => request.Status === 'pending').length}</p>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@ export default function StatsCards({ requests }) {
           </div>
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Approved</p>
-            <p className="text-xl font-bold text-gray-900">{requests.filter(r => r.Status === 'approved').length}</p>
+            <p className="text-xl font-bold text-gray-900">{requests.filter(request => request.Status === 'approved').length}</p>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function StatsCards({ requests }) {
           </div>
           <div className="ml-3">
             <p className="text-xs font-medium text-gray-600">Rejected</p>
-            <p className="text-xl font-bold text-gray-900">{requests.filter(r => r.Status === 'rejected').length}</p>
+            <p className="text-xl font-bold text-gray-900">{requests.filter(request => request.Status === 'rejected').length}</p>
           </div>
         </div>
       </div>

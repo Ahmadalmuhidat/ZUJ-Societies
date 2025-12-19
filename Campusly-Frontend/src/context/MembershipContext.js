@@ -49,7 +49,7 @@ export function MembershipProvider({ children }) {
       let isModerator = false;
 
       if (isMember && society?.Members) {
-        const memberData = society.Members.find(m => m.User === user.ID);
+        const memberData = society.Members.find(member => member.User === user.ID);
         userRole = memberData?.Role || 'member';
         isModerator = userRole === 'moderator';
       }

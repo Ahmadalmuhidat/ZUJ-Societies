@@ -14,6 +14,7 @@ exports.CreateTicket = async (req, res) => {
     });
 
     await newTicket.save();
+
     res.status(201).json({ data: newTicket });
   } catch (err) {
     console.error(err);

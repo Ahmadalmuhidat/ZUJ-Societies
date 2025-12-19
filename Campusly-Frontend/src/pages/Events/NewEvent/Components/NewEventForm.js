@@ -82,7 +82,7 @@ export default function NewEventForm() {
     setFormData(prev => ({
       ...prev,
       tags: prev.tags.includes(tag)
-        ? prev.tags.filter(t => t !== tag)
+        ? prev.tags.filter(tag => tag !== tag)
         : [...prev.tags, tag]
     }));
   };

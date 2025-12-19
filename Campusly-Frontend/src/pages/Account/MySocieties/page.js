@@ -33,7 +33,7 @@ export default function MySocieties() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const adminSocieties = societies.filter(soc => soc.Role === 'admin' || soc.Role === 'creator');
+  const adminSocieties = societies.filter(society => society.Role === 'admin' || society.Role === 'creator');
 
   return (
     <main className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>

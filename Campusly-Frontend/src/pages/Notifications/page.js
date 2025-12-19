@@ -14,7 +14,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     const fetchInvitationStatuses = async () => {
-      const invitations = notifications.filter(n => n.Type === 'invitation');
+      const invitations = notifications.filter(notification => notification.Type === 'invitation');
       const statuses = {};
 
       for (const notif of invitations) {
